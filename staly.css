@@ -8,3 +8,34 @@ body {
 canvas {
   display: block;
 }
+
+.loja {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  width: 250px;
+  background: rgba(255,255,255,0.9);
+  border: 2px solid #333;
+  padding: 15px;
+  display: none;
+  font-family: Arial, sans-serif;
+}
+
+.loja h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.loja button {
+  display: block;
+  margin: 10px auto;
+  padding: 8px 12px;
+  background: #0077cc;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.loja button:hover {
+  background: #005fa3;
+}
