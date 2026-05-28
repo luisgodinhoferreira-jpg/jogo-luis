@@ -1,1 +1,31 @@
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 800;
+canvas.height = 600;
 
+let pipa = { x: 400, y: 300, size: 40 };
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp") pipa.y -= 10;
+  if (e.key === "ArrowDown") pipa.y += 10;
+  if (e.key === "ArrowLeft") pipa.x -= 10;
+  if (e.key === "ArrowRight") pipa.x += 10;
+});
+
+function desenharPipa() {
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.moveTo(pipa.x, pipa.y);
+  ctx.lineTo(pipa.x - pipa.size, pipa.y + pipa.size);
+  ctx.lineTo(pipa.x + pipa.size, pipa.y + pipa.size);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function loop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  desenharPipa();
+  requestAnimationFrame(loop);
+}
+
+loop();
