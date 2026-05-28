@@ -1,3 +1,67 @@
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const somVento = document.getElementById("vento");
+somVento.volume = 0.3;
+somVento.play();
+
+let pontos = 0;
+let moedas = 0;
+let dificuldade = "medio";
+
+let pipa = { x: canvas.width / 2, y: canvas.height / 3, size: 40 };
+let vento = 0.5;
+let nuvens = Array.from({ length: 5 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * 200,
+  velocidade: 0.3 + Math.random() * 0.5
+}));
+
+let pipasDisponiveis = [
+  { nome: "Pipa Vermelha", preco: 0, imagem: "pipa_vermelha.png" },
+  { nome: "Pipa Azul", preco: 100, imagem: "pipa_azul.png" },
+  { nome: "Pipa Verde", preco: 200, imagem: "pipa_verde.png" },
+  { nome: "Pipa Dourada", preco: 500, imagem: "pipa_dourada.png" }
+];
+
+let pipaAtual = pipasDisponiveis[0];
+let imgPipa = new Image();
+imgPipa.src = pipaAtual.imagem;
+
+function desenharNuvens() {
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  nuvens.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, 50, 0, Math.PI * 2);
+    ctx.fill();
+    n.x -= n.velocidade;
+    if (n.x < -100) n.x = canvas.width + 100;
+  });
+}
+
+function desenharMaos() {
+  ctx.fillStyle = "#d2a679";
+  ctx.fillRect(canvas.width / 2 - 80, canvas.height - 100, 40, 40);
+  ctx.fillRect(canvas.width / 2 + 40, canvas.height - 100, 40, 40);
+}
+
+function desenharLinhas() {
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(canvas.width / 2 - 60, canvas.height - 100);
+  ctx.lineTo(pipa.x + Math.sin(Date.now()/100)*2, pipa.y);
+  ctx.moveTo(canvas.width / 2 + 60, canvas.height - 100);
+  ctx.lineTo(pipa.x + Math.cos(Date.now()/100)*2, pipa.y);
+  ctx.stroke();
+}
+
+function desenharPipa() {
+  ctx.drawImage(imgPipa, pipa.x - pipa.size, pipa.y - pipa.size, pipa.size * 2, pipa.size * 2);
+}
+
 function desenharHUD() {
   ctx.fillStyle = "black";
   ctx.font = "20px Arial";
@@ -5,3 +69,56 @@ function desenharHUD() {
   ctx.fillText("Moedas: " + moedas, 20, 60);
   ctx.fillText("Dificuldade: " + dificuldade, 20, 90);
 }
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp") pipa.y -= 10;
+  if (e.key === "ArrowDown") pipa.y += 10;
+  if (e.key === "ArrowLeft") pipa.x -= 10;
+  if (e.key === "ArrowRight") pipa.x += 10;
+  if (e.key === "l") abrirLoja(); // tecla L abre a loja
+});
+
+function atualizarPontuacao() {
+  pontos++;
+  if (pontos % 50 === 0) moedas += dificuldade === "dificil" ? 5 : 2;
+}
+
+function abrirLoja() {
+  document.getElementById("loja").style.display = "block";
+  let divPipas = document.getElementById("pipas");
+  divPipas.innerHTML = "";
+  pipasDisponiveis.forEach((p, i) => {
+    divPipas.innerHTML += `
+      <p>${p.nome} - ${p.preco} moedas 
+      <button onclick="comprarPipa(${i})">Comprar</button></p>`;
+  });
+}
+
+function fecharLoja() {
+  document.getElementById("loja").style.display = "none";
+}
+
+function comprarPipa(indice) {
+  if (moedas >= pipasDisponiveis[indice].preco) {
+    moedas -= pipasDisponiveis[indice].preco;
+    pipaAtual = pipasDisponiveis[indice];
+    imgPipa.src = pipaAtual.imagem;
+    alert("Você comprou: " + pipaAtual.nome);
+  } else {
+    alert("Moedas insuficientes!");
+  }
+}
+
+function loop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  desenharNuvens();
+  pipa.x += Math.sin(Date.now() / 1000) * vento;
+  desenharLinhas();
+  desenharPipa();
+  desenharMaos();
+  desenharHUD();
+  atualizarPontuacao();
+  requestAnimationFrame(loop);
+}
+
+loop();
