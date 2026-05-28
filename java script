@@ -1,22 +1,28 @@
-function iniciarJogo(nivel) {
-  dificuldade = nivel;
-  configurarDificuldade();
-  document.getElementById("menu").style.display = "none";
-  loop();
-}
+function desenharCena() {
+  // fundo
+  ctx.fillStyle = "skyblue";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-function configurarDificuldade() {
-  if (dificuldade === "facil") {
-    velocidadeObstaculo = 3;
-    intervaloObstaculo = 3000;
-    ventoForca = 0.3;
-  } else if (dificuldade === "medio") {
-    velocidadeObstaculo = 5;
-    intervaloObstaculo = 2000;
-    ventoForca = 0.5;
-  } else if (dificuldade === "dificil") {
-    velocidadeObstaculo = 7;
-    intervaloObstaculo = 1000;
-    ventoForca = 1.0;
-  }
+  // mãos
+  ctx.fillStyle = "tan";
+  ctx.fillRect(350, 550, 40, 40);
+  ctx.fillRect(410, 550, 40, 40);
+
+  // linhas
+  ctx.strokeStyle = "black";
+  ctx.beginPath();
+  ctx.moveTo(370, 550);
+  ctx.lineTo(pipa.x, pipa.y);
+  ctx.moveTo(430, 550);
+  ctx.lineTo(pipa.x, pipa.y);
+  ctx.stroke();
+
+  // pipa
+  ctx.fillStyle = pipaAtual.cor;
+  ctx.beginPath();
+  ctx.moveTo(pipa.x, pipa.y);
+  ctx.lineTo(pipa.x - pipa.size, pipa.y + pipa.size);
+  ctx.lineTo(pipa.x + pipa.size, pipa.y + pipa.size);
+  ctx.closePath();
+  ctx.fill();
 }
