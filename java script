@@ -1,86 +1,22 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 600;
-
-let pipa = { x: 400, y: 300, size: 40 };
-let obstaculos = [];
-let pontos = 0;
-let jogoAtivo = true;
-
-// Movimento da pipa
-document.addEventListener("keydown", e => {
-  if (e.key === "ArrowUp") pipa.y -= 10;
-  if (e.key === "ArrowDown") pipa.y += 10;
-  if (e.key === "ArrowLeft") pipa.x -= 10;
-  if (e.key === "ArrowRight") pipa.x += 10;
-});
-
-// Criar obstáculos
-function criarObstaculo() {
-  let y = Math.random() * canvas.height;
-  obstaculos.push({ x: canvas.width, y: y, size: 30 });
-}
-setInterval(criarObstaculo, 2000);
-
-// Desenhar pipa
-function desenharPipa() {
-  ctx.fillStyle = "red";
-  ctx.beginPath();
-  ctx.moveTo(pipa.x, pipa.y);
-  ctx.lineTo(pipa.x - pipa.size, pipa.y + pipa.size);
-  ctx.lineTo(pipa.x + pipa.size, pipa.y + pipa.size);
-  ctx.closePath();
-  ctx.fill();
+function iniciarJogo(nivel) {
+  dificuldade = nivel;
+  configurarDificuldade();
+  document.getElementById("menu").style.display = "none";
+  loop();
 }
 
-// Desenhar obstáculos
-function desenharObstaculos() {
-  ctx.fillStyle = "gray";
-  obstaculos.forEach(o => {
-    ctx.beginPath();
-    ctx.arc(o.x, o.y, o.size, 0, Math.PI * 2);
-    ctx.fill();
-    o.x -= 5; // movimento para esquerda
-  });
-}
-
-// Colisão
-function verificarColisao() {
-  obstaculos.forEach(o => {
-    let dx = pipa.x - o.x;
-    let dy = pipa.y - o.y;
-    let distancia = Math.sqrt(dx * dx + dy * dy);
-    if (distancia < pipa.size + o.size) {
-      jogoAtivo = false;
-    }
-  });
-}
-
-// Loop principal
-function loop() {
-  if (!jogoAtivo) {
-    ctx.fillStyle = "black";
-    ctx.font = "40px Arial";
-    ctx.fillText("Game Over! Pontos: " + pontos, 200, 300);
-    return;
+function configurarDificuldade() {
+  if (dificuldade === "facil") {
+    velocidadeObstaculo = 3;
+    intervaloObstaculo = 3000;
+    ventoForca = 0.3;
+  } else if (dificuldade === "medio") {
+    velocidadeObstaculo = 5;
+    intervaloObstaculo = 2000;
+    ventoForca = 0.5;
+  } else if (dificuldade === "dificil") {
+    velocidadeObstaculo = 7;
+    intervaloObstaculo = 1000;
+    ventoForca = 1.0;
   }
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // vento leve
-  pipa.x += Math.sin(Date.now() / 1000) * 0.5;
-
-  desenharPipa();
-  desenharObstaculos();
-  verificarColisao();
-
-  pontos++;
-  ctx.fillStyle = "black";
-  ctx.font = "20px Arial";
-  ctx.fillText("Pontos: " + pontos, 10, 20);
-
-  requestAnimationFrame(loop);
 }
-
-loop();
