@@ -1,73 +1,7 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const somVento = document.getElementById("vento");
-somVento.volume = 0.3;
-somVento.play();
-
-let pipa = { x: canvas.width / 2, y: canvas.height / 3, size: 40 };
-let vento = 0.5;
-let nuvens = Array.from({ length: 5 }, () => ({
-  x: Math.random() * canvas.width,
-  y: Math.random() * 200,
-  velocidade: 0.3 + Math.random() * 0.5
-}));
-
-function desenharNuvens() {
-  ctx.fillStyle = "rgba(255,255,255,0.8)";
-  nuvens.forEach(n => {
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, 50, 0, Math.PI * 2);
-    ctx.fill();
-    n.x -= n.velocidade;
-    if (n.x < -100) n.x = canvas.width + 100;
-  });
+function desenharHUD() {
+  ctx.fillStyle = "black";
+  ctx.font = "20px Arial";
+  ctx.fillText("Pontos: " + pontos, 20, 30);
+  ctx.fillText("Moedas: " + moedas, 20, 60);
+  ctx.fillText("Dificuldade: " + dificuldade, 20, 90);
 }
-
-function desenharMaos() {
-  ctx.fillStyle = "#d2a679";
-  ctx.fillRect(canvas.width / 2 - 80, canvas.height - 100, 40, 40);
-  ctx.fillRect(canvas.width / 2 + 40, canvas.height - 100, 40, 40);
-}
-
-function desenharLinhas() {
-  ctx.strokeStyle = "white";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(canvas.width / 2 - 60, canvas.height - 100);
-  ctx.lineTo(pipa.x, pipa.y);
-  ctx.moveTo(canvas.width / 2 + 60, canvas.height - 100);
-  ctx.lineTo(pipa.x, pipa.y);
-  ctx.stroke();
-}
-
-function desenharPipa() {
-  ctx.fillStyle = "red";
-  ctx.beginPath();
-  ctx.moveTo(pipa.x, pipa.y);
-  ctx.lineTo(pipa.x - pipa.size, pipa.y + pipa.size);
-  ctx.lineTo(pipa.x + pipa.size, pipa.y + pipa.size);
-  ctx.closePath();
-  ctx.fill();
-}
-
-document.addEventListener("keydown", e => {
-  if (e.key === "ArrowUp") pipa.y -= 10;
-  if (e.key === "ArrowDown") pipa.y += 10;
-  if (e.key === "ArrowLeft") pipa.x -= 10;
-  if (e.key === "ArrowRight") pipa.x += 10;
-});
-
-function loop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  desenharNuvens();
-  pipa.x += Math.sin(Date.now() / 1000) * vento;
-  desenharLinhas();
-  desenharPipa();
-  desenharMaos();
-  requestAnimationFrame(loop);
-}
-
-loop();
