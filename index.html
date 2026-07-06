@@ -1,17 +1,5037 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fut-Pong no GitHub</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🐉 JOGO NINJA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background: #0a0a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .fullscreen-mode {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+            padding: 10px !important;
+            z-index: 9999 !important;
+            background: #0a0a1a !important;
+            overflow: hidden !important;
+        }
+
+        .fullscreen-mode canvas {
+            max-width: 100% !important;
+            max-height: 65vh !important;
+            aspect-ratio: auto !important;
+            height: auto !important;
+        }
+
+        .fullscreen-mode .game-container {
+            border-radius: 0 !important;
+            max-width: 100% !important;
+            height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+
+        /* ===== LOGIN 3D ===== */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse at center, #0a0a2a 0%, #050510 100%);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .login-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(2px 2px at 50px 160px, #ddd, transparent),
+                radial-gradient(2px 2px at 90px 40px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(2px 2px at 130px 80px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.7), transparent);
+            background-size: 200px 200px;
+            background-repeat: repeat;
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .dragon-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .dragon {
+            position: absolute;
+            font-size: 8rem;
+            animation: dragonFly 25s ease-in-out infinite;
+            filter: drop-shadow(0 0 50px rgba(255, 100, 0, 0.4));
+            opacity: 0.2;
+            text-shadow: 0 0 60px rgba(255, 100, 0, 0.2);
+        }
+
+        .dragon:nth-child(1) {
+            top: 5%;
+            left: -15%;
+            animation-delay: 0s;
+            font-size: 10rem;
+            opacity: 0.15;
+        }
+
+        .dragon:nth-child(2) {
+            bottom: 5%;
+            right: -15%;
+            animation-delay: -8s;
+            font-size: 8rem;
+            opacity: 0.12;
+            animation-duration: 28s;
+        }
+
+        .dragon:nth-child(3) {
+            top: 45%;
+            left: -10%;
+            animation-delay: -15s;
+            font-size: 6rem;
+            opacity: 0.10;
+            animation-duration: 32s;
+        }
+
+        .dragon:nth-child(4) {
+            bottom: 35%;
+            right: -10%;
+            animation-delay: -4s;
+            font-size: 7rem;
+            opacity: 0.08;
+            animation-duration: 24s;
+        }
+
+        .dragon:nth-child(5) {
+            top: 25%;
+            left: 40%;
+            animation-delay: -12s;
+            font-size: 5rem;
+            opacity: 0.06;
+            animation-duration: 35s;
+            animation-direction: reverse;
+        }
+
+        @keyframes dragonFly {
+            0% {
+                transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+            }
+
+            10% {
+                transform: translateX(10%) translateY(-8%) rotate(6deg) scale(1.05);
+            }
+
+            20% {
+                transform: translateX(22%) translateY(10%) rotate(-4deg) scale(0.95);
+            }
+
+            30% {
+                transform: translateX(38%) translateY(-12%) rotate(9deg) scale(1.08);
+            }
+
+            40% {
+                transform: translateX(55%) translateY(6%) rotate(-6deg) scale(0.92);
+            }
+
+            50% {
+                transform: translateX(70%) translateY(-10%) rotate(12deg) scale(1.12);
+            }
+
+            60% {
+                transform: translateX(85%) translateY(14%) rotate(-9deg) scale(0.88);
+            }
+
+            70% {
+                transform: translateX(100%) translateY(-6%) rotate(7deg) scale(1.02);
+            }
+
+            80% {
+                transform: translateX(95%) translateY(10%) rotate(-5deg) scale(0.96);
+            }
+
+            90% {
+                transform: translateX(78%) translateY(-15%) rotate(14deg) scale(1.15);
+            }
+
+            100% {
+                transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+            }
+        }
+
+        .login-3d-container {
+            perspective: 1200px;
+            width: 450px;
+            height: 620px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .login-3d-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: float3d 6s ease-in-out infinite;
+        }
+
+        @keyframes float3d {
+
+            0%,
+            100% {
+                transform: rotateY(-5deg) rotateX(5deg) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(5deg) rotateX(-5deg) translateY(-15px);
+            }
+        }
+
+        .login-3d-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, rgba(26, 26, 62, 0.92), rgba(42, 26, 78, 0.92));
+            border-radius: 30px;
+            border: 2px solid rgba(233, 69, 96, 0.5);
+            box-shadow: 0 20px 60px rgba(233, 69, 96, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateZ(40px);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            backface-visibility: hidden;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-3d-front::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(233, 69, 96, 0.1), transparent 60%);
+            pointer-events: none;
+        }
+
+        .login-3d-front .dragon-bg {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 15rem;
+            opacity: 0.04;
+            transform: rotate(15deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .login-3d-front .dragon-bg-2 {
+            position: absolute;
+            top: -30px;
+            left: -30px;
+            font-size: 10rem;
+            opacity: 0.03;
+            transform: rotate(-25deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .login-3d-side {
+            position: absolute;
+            background: rgba(15, 15, 42, 0.9);
+            border: 1px solid rgba(233, 69, 96, 0.2);
+        }
+
+        .login-3d-left {
+            width: 40px;
+            height: 100%;
+            transform: rotateY(90deg) translateZ(-20px) translateX(-20px);
+            right: 50%;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .login-3d-right {
+            width: 40px;
+            height: 100%;
+            transform: rotateY(90deg) translateZ(-20px) translateX(20px);
+            left: 50%;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .login-3d-top {
+            width: 100%;
+            height: 40px;
+            transform: rotateX(90deg) translateZ(-20px) translateY(-20px);
+            bottom: 50%;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .login-3d-bottom {
+            width: 100%;
+            height: 40px;
+            transform: rotateX(90deg) translateZ(-20px) translateY(20px);
+            top: 50%;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .login-content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .game-title {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .game-title .main-title {
+            font-size: 3.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f5c842, #e94560, #f5c842, #e94560);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            animation: titleShine 3s ease-in-out infinite;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            position: relative;
+            display: inline-block;
+            padding: 0 20px;
+        }
+
+        .game-title .main-title::after {
+            content: '⚔️';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            -webkit-text-fill-color: initial;
+            color: #f5c842;
+        }
+
+        .game-title .main-title::before {
+            content: '⚔️';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            -webkit-text-fill-color: initial;
+            color: #f5c842;
+        }
+
+        @keyframes titleShine {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .game-title .sub-title {
+            color: #aaa;
+            font-size: 0.85rem;
+            letter-spacing: 8px;
+            margin-top: 2px;
+            font-weight: 300;
+            text-shadow: 0 0 20px rgba(245, 200, 66, 0.2);
+        }
+
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 6px;
+            margin-top: 5px;
+        }
+
+        .tab-btn {
+            padding: 6px 20px;
+            border: 2px solid #555;
+            border-radius: 20px;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .tab-btn.active {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.2);
+            color: #f0e6d0;
+        }
+
+        .tab-btn:hover {
+            border-color: #e94560;
+        }
+
+        .login-form {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .login-form.active {
+            display: flex;
+        }
+
+        .login-form input {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 2px solid #333;
+            background: rgba(0, 0, 0, 0.4);
+            color: #f0e6d0;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #e94560;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.2);
+        }
+
+        .login-form input::placeholder {
+            color: #555;
+        }
+
+        .login-btn {
+            padding: 10px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #e94560, #c0392b);
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .login-error {
+            color: #e94560;
+            font-size: 0.8rem;
+            text-align: center;
+            min-height: 20px;
+            margin-top: 3px;
+        }
+
+        .login-success {
+            color: #4CAF50;
+            font-size: 0.8rem;
+            text-align: center;
+            min-height: 20px;
+            margin-top: 3px;
+        }
+
+        .login-info {
+            margin-top: auto;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            color: #666;
+            font-size: 0.7rem;
+            flex-wrap: wrap;
+            padding-top: 6px;
+        }
+
+        .login-info span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+
+        /* ===== TELA DE ESCOLHA ===== */
+        .character-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse at center, #1a1a3e 0%, #0a0a1a 100%);
+            z-index: 999;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .character-container {
+            background: linear-gradient(145deg, #1a1a3e, #2a1a4e);
+            border-radius: 30px;
+            border: 2px solid rgba(233, 69, 96, 0.5);
+            box-shadow: 0 20px 60px rgba(233, 69, 96, 0.3);
+            padding: 30px;
+            max-width: 850px;
+            width: 95%;
+            text-align: center;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .character-container h1 {
+            color: #f5c842;
+            font-size: 1.8rem;
+            margin-bottom: 3px;
+        }
+
+        .character-subtitle {
+            color: #aaa;
+            margin-bottom: 18px;
+            font-size: 0.9rem;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 8px 24px;
+            border: 2px solid #555;
+            border-radius: 14px;
+            background: transparent;
+            color: #aaa;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.2);
+            color: #f0e6d0;
+        }
+
+        .controller-status {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .controller-status .status-item {
+            color: #aaa;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .controller-status .status-item .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .controller-status .status-item .dot.on {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .controller-status .status-item .dot.off {
+            background: #555;
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .character-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 3px solid #333;
+            border-radius: 14px;
+            padding: 14px 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .character-card:hover {
+            transform: scale(1.05);
+            border-color: #e94560;
+        }
+
+        .character-card.selected {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.1);
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.2);
+        }
+
+        .character-card .player-tag {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            background: #e94560;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: bold;
+        }
+
+        .character-card .player-tag.p2 {
+            background: #2196F3;
+            left: auto;
+            right: -8px;
+        }
+
+        .character-icon {
+            font-size: 2.2rem;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 6px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #333;
+        }
+
+        .character-name {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .character-symbol {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        .character-desc {
+            color: #888;
+            font-size: 0.7rem;
+        }
+
+        .character-check {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 1rem;
+        }
+
+        .character-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .confirm-btn {
+            padding: 12px 35px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #4CAF50, #2d7a2d);
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .confirm-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4);
+        }
+
+        .back-btn {
+            padding: 12px 25px;
+            border: 2px solid #555;
+            border-radius: 14px;
+            background: transparent;
+            color: #aaa;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            border-color: #e94560;
+            color: #f0e6d0;
+        }
+
+        /* ===== TELA DE ESCOLHA DE PODERES ===== */
+        .power-select-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+
+        .power-select-container {
+            background: linear-gradient(145deg, #1a1a3e, #2a1a4e);
+            border-radius: 30px;
+            border: 3px solid #f5c842;
+            box-shadow: 0 0 80px rgba(245, 200, 66, 0.3);
+            padding: 40px;
+            max-width: 700px;
+            width: 95%;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: powerSelectIn 0.5s ease-out;
+        }
+
+        @keyframes powerSelectIn {
+            0% {
+                transform: scale(0.8) rotateY(30deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        .power-select-container h1 {
+            color: #f5c842;
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 30px rgba(245, 200, 66, 0.3);
+        }
+
+        .power-select-container .sub {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .power-select-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .power-select-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #444;
+            border-radius: 16px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .power-select-card:hover {
+            transform: scale(1.05);
+            border-color: #f5c842;
+        }
+
+        .power-select-card.selected {
+            border-color: #f5c842;
+            background: rgba(245, 200, 66, 0.15);
+            box-shadow: 0 0 30px rgba(245, 200, 66, 0.2);
+        }
+
+        .power-select-card .power-icon {
+            font-size: 3rem;
+            margin-bottom: 5px;
+        }
+
+        .power-select-card .power-name {
+            color: #f0e6d0;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .power-select-card .power-desc {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+
+        .power-select-card .power-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+        }
+
+        .power-select-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .power-select-btn {
+            padding: 12px 40px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f5c842, #e94560);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .power-select-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(245, 200, 66, 0.4);
+        }
+
+        .power-select-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .power-select-skip {
+            padding: 12px 30px;
+            border: 2px solid #555;
+            border-radius: 14px;
+            background: transparent;
+            color: #aaa;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .power-select-skip:hover {
+            border-color: #e94560;
+            color: #f0e6d0;
+        }
+
+        /* ===== TELA DO JOGO ===== */
+        .game-screen {
+            width: 100%;
+            min-height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: #0a0a1a;
+            padding: 10px;
+        }
+
+        .game-container {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border: 2px solid #e94560;
+            max-width: 960px;
+            width: 100%;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px 12px 8px;
+            color: #f0e6d0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .game-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .game-header-left h1 {
+            font-size: 1.1rem;
+        }
+
+        .phase-name {
+            color: #f5c842;
+            font-size: 0.8rem;
+        }
+
+        .game-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .user-info {
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+
+        .controller-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .controller-indicator .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .controller-indicator .dot.on {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .controller-indicator .dot.off {
+            background: #555;
+        }
+
+        .logout-btn,
+        .fullscreen-btn {
+            background: #333;
+            border: none;
+            color: #aaa;
+            padding: 4px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.75rem;
+        }
+
+        .logout-btn:hover {
+            background: #e94560;
+            color: white;
+        }
+
+        .fullscreen-btn:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .fullscreen-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 14px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            background: #2d4059;
+            cursor: crosshair;
+            width: 100%;
+            height: auto;
+            max-width: 900px;
+            aspect-ratio: 900/600;
+            touch-action: none;
+        }
+
+        .mobile-controls {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            gap: 12px;
+            touch-action: none;
+            flex-wrap: wrap;
+        }
+
+        .controls-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .controls-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .controls-group .group-label {
+            color: #888;
+            font-size: 0.65rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .controls-group.p1 .group-label {
+            color: #e94560;
+        }
+
+        .controls-group.p2 .group-label {
+            color: #2196F3;
+        }
+
+        .dpad {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dpad-row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .ctrl-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            border: 2px solid #e94560;
+            background: rgba(26, 26, 46, 0.85);
+            color: #f0e6d0;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            touch-action: none;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 #0f3460;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ctrl-btn:active,
+        .ctrl-btn.active {
+            transform: scale(0.92);
+            background: #e94560;
+            box-shadow: 0 1px 0 #0f3460;
+        }
+
+        .ctrl-btn.action-btn {
+            width: 55px;
+            height: 40px;
+            font-size: 0.7rem;
+            background: rgba(233, 69, 96, 0.3);
+            border-color: #ff6b81;
+        }
+
+        .ctrl-btn.action-btn:active,
+        .ctrl-btn.action-btn.active {
+            background: #e94560;
+        }
+
+        .ctrl-btn.p2-btn {
+            border-color: #2196F3;
+        }
+
+        .ctrl-btn.p2-btn:active,
+        .ctrl-btn.p2-btn.active {
+            background: #2196F3;
+            box-shadow: 0 1px 0 #0f3460;
+        }
+
+        .ctrl-btn.p2-btn.action-btn {
+            background: rgba(33, 150, 243, 0.3);
+            border-color: #64B5F6;
+        }
+
+        .ctrl-btn.p2-btn.action-btn:active,
+        .ctrl-btn.p2-btn.action-btn.active {
+            background: #2196F3;
+        }
+
+        .info-panel {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            color: #eee;
+            font-weight: bold;
+            padding: 10px 18px;
+            background: #0f3460;
+            border-radius: 30px;
+            border: 1px solid #e94560;
+            gap: 8px;
+        }
+
+        .info-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .info-left span {
+            color: #f5c842;
+        }
+
+        .info-center {
+            display: flex;
+            gap: 14px;
+            color: #f5c842;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .info-center .p1-score {
+            color: #e94560;
+        }
+
+        .info-center .p2-score {
+            color: #2196F3;
+        }
+
+        .info-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .info-panel button {
+            background: #e94560;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 0 #a02040;
+            letter-spacing: 1px;
+        }
+
+        .info-panel button:hover {
+            background: #ff6b81;
+            transform: scale(1.02);
+            box-shadow: 0 4px 0 #a02040;
+        }
+
+        .info-panel button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #a02040;
+        }
+
+        .next-btn {
+            background: #4CAF50 !important;
+            box-shadow: 0 3px 0 #2d7a2d !important;
+        }
+
+        .next-btn:hover {
+            background: #66bb6a !important;
+            box-shadow: 0 4px 0 #2d7a2d !important;
+        }
+
+        .phase-selector {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .phase-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #555;
+            background: transparent;
+            color: #888;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            font-size: 0.8rem;
+        }
+
+        .phase-btn:hover {
+            border-color: #e94560;
+            color: #f0e6d0;
+        }
+
+        .phase-btn.active {
+            background: #e94560;
+            border-color: #e94560;
+            color: white;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .phase-btn.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .phase-btn .power-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #f5c842;
+            color: #1a1a3e;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .phase-btn .completion-check {
+            position: absolute;
+            bottom: -6px;
+            left: -6px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            font-size: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .power-bar {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .power-bar .power-label {
+            color: #f5c842;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .power-bar .power-slots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .power-bar .power-slot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .power-bar .power-slot.active {
+            border-color: #f5c842;
+            background: rgba(245, 200, 66, 0.2);
+            box-shadow: 0 0 15px rgba(245, 200, 66, 0.3);
+            animation: powerPulse 1s ease-in-out infinite;
+        }
+
+        .power-bar .power-slot.used {
+            border-color: #666;
+            background: rgba(100, 100, 100, 0.2);
+            opacity: 0.5;
+        }
+
+        @keyframes powerPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .power-bar .power-slot.locked {
+            opacity: 0.3;
+        }
+
+        .controls-info {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .controls-info .key-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .controls-info kbd {
+            background: #222;
+            color: #f5c842;
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .controls-info .key-group.p1 kbd {
+            border-color: #e94560;
+            color: #e94560;
+        }
+
+        .controls-info .key-group.p2 kbd {
+            border-color: #2196F3;
+            color: #2196F3;
+        }
+
+        .achievement-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #f5c842;
+            border-radius: 16px;
+            padding: 15px 25px;
+            color: #f0e6d0;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.5s ease;
+            max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .achievement-notification.show {
+            transform: translateX(0);
+        }
+
+        .achievement-notification .ach-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #f5c842;
+        }
+
+        .achievement-notification .ach-desc {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 3px;
+        }
+
+        .achievement-notification .ach-icon {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+
+        /* ===== GAMEPAD LAYOUT INFO ===== */
+        .gamepad-layout {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .gamepad-layout .gp-col {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.7rem;
+        }
+
+        .gamepad-layout .gp-col .gp-btn {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+
+        .gamepad-layout .gp-col .gp-btn.dash {
+            background: #ffa500;
+            color: #1a1a3e;
+        }
+
+        .gamepad-layout .gp-col .gp-btn.attack {
+            background: #e94560;
+            color: white;
+        }
+
+        .gamepad-layout .gp-col .gp-btn.power {
+            background: #f5c842;
+            color: #1a1a3e;
+        }
+
+        /* ===== BOSS INDICATOR ===== */
+        .boss-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #e94560;
+            text-shadow: 0 0 40px rgba(233, 69, 96, 0.5);
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0;
+            transition: all 0.5s;
+            animation: bossAppear 1s ease-out forwards;
+        }
+
+        @keyframes bossAppear {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-3d-container {
+                width: 95%;
+                height: auto;
+                min-height: 480px;
+            }
+
+            .login-3d-front {
+                padding: 20px 15px;
+                transform: translateZ(20px);
+            }
+
+            .login-3d-side {
+                display: none;
+            }
+
+            .character-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .character-container {
+                padding: 20px;
+            }
+
+            .character-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+            }
+
+            .game-container {
+                padding: 10px;
+                border-radius: 14px;
+            }
+
+            .mobile-controls {
+                display: flex;
+            }
+
+            .controls-container {
+                gap: 8px;
+            }
+
+            .controls-group {
+                padding: 4px;
+            }
+
+            .ctrl-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 0.8rem;
+                border-radius: 10px;
+            }
+
+            .ctrl-btn.action-btn {
+                width: 48px;
+                height: 34px;
+                font-size: 0.6rem;
+            }
+
+            .game-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .info-panel {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 10px 14px;
+                border-radius: 16px;
+            }
+
+            .info-center {
+                flex-wrap: wrap;
+                justify-content: center;
+                font-size: 0.8rem;
+            }
+
+            .phase-selector {
+                gap: 4px;
+            }
+
+            .phase-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.7rem;
+            }
+
+            .fullscreen-mode {
+                padding: 4px !important;
+            }
+
+            .fullscreen-mode .game-container {
+                padding: 6px !important;
+            }
+
+            .fullscreen-mode canvas {
+                max-height: 55vh !important;
+            }
+
+            .controller-status {
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .dragon {
+                font-size: 5rem !important;
+            }
+
+            .game-title .main-title {
+                font-size: 2.2rem;
+                letter-spacing: 3px;
+            }
+
+            .game-title .main-title::before,
+            .game-title .main-title::after {
+                display: none;
+            }
+
+            .game-title .sub-title {
+                font-size: 0.7rem;
+                letter-spacing: 5px;
+            }
+
+            .power-select-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .power-select-container {
+                padding: 25px;
+            }
+
+            .gamepad-layout {
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .character-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .character-card {
+                padding: 10px 8px;
+            }
+
+            .character-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 1.5rem;
+            }
+
+            .ctrl-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 0.7rem;
+                border-radius: 8px;
+            }
+
+            .ctrl-btn.action-btn {
+                width: 42px;
+                height: 30px;
+                font-size: 0.55rem;
+            }
+
+            .phase-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 0.6rem;
+            }
+
+            .power-bar .power-slot {
+                width: 22px;
+                height: 22px;
+                font-size: 0.65rem;
+            }
+
+            .mode-selector {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .dragon {
+                font-size: 3.5rem !important;
+            }
+
+            .game-title .main-title {
+                font-size: 1.6rem;
+                letter-spacing: 2px;
+            }
+
+            .game-title .sub-title {
+                font-size: 0.6rem;
+                letter-spacing: 3px;
+            }
+
+            .power-select-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .power-select-container {
+                padding: 20px;
+            }
+
+            .gamepad-layout {
+                gap: 10px;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <div class="game-container">
-        <h1>Fut-Pong ⚽</h1>
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
-        <p>Controles: Jogador 1 (W/S) | Jogador 2 (Setas Cima/Baixo)</p>
+    <!-- TELA DE LOGIN 3D -->
+    <div id="loginScreen" class="login-screen">
+        <div class="dragon-container">
+            <div class="dragon">🐉</div>
+            <div class="dragon">🐲</div>
+            <div class="dragon">🐉</div>
+            <div class="dragon">🐲</div>
+            <div class="dragon">🐉</div>
+        </div>
+
+        <div class="login-3d-container">
+            <div class="login-3d-box">
+                <div class="login-3d-front">
+                    <div class="dragon-bg">🐉</div>
+                    <div class="dragon-bg-2">🐲</div>
+
+                    <div class="login-content">
+                        <div class="game-title">
+                            <div class="main-title">⚔️ JOGO NINJA ⚔️</div>
+                            <div class="sub-title">🐉 9 FASES FÁCEIS • 1 CHEFÃO 🐉</div>
+                        </div>
+
+                        <div class="login-tabs">
+                            <button class="tab-btn active" data-tab="login">Login</button>
+                            <button class="tab-btn" data-tab="register">Registrar</button>
+                        </div>
+
+                        <form id="loginForm" class="login-form active" onsubmit="return handleLogin(event)">
+                            <input type="text" id="loginUser" placeholder="👤 Usuário" required>
+                            <input type="password" id="loginPass" placeholder="🔒 Senha" required>
+                            <button type="submit" class="login-btn">▶ Entrar</button>
+                            <div class="login-error" id="loginError"></div>
+                        </form>
+
+                        <form id="registerForm" class="login-form" onsubmit="return handleRegister(event)">
+                            <input type="text" id="registerUser" placeholder="👤 Novo Usuário (mín. 3)" required>
+                            <input type="password" id="registerPass" placeholder="🔒 Senha (mín. 4)" required>
+                            <input type="password" id="registerPassConfirm" placeholder="🔒 Confirmar Senha" required>
+                            <button type="submit" class="login-btn">✦ Criar Conta</button>
+                            <div class="login-error" id="registerError"></div>
+                            <div class="login-success" id="registerSuccess"></div>
+                        </form>
+
+                        <div class="login-info">
+                            <span>👤 Demo: ninja / 123456</span>
+                            <span>🎮 samurai / 654321</span>
+                            <span>🎮 Conecte seu Gamepad!</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-3d-side login-3d-left"></div>
+                <div class="login-3d-side login-3d-right"></div>
+                <div class="login-3d-side login-3d-top"></div>
+                <div class="login-3d-side login-3d-bottom"></div>
+            </div>
+        </div>
     </div>
-    <script src="game.js"></script>
+
+    <!-- TELA DE ESCOLHA DE NINJA -->
+    <div id="characterScreen" class="character-screen" style="display:none;">
+        <div class="character-container">
+            <h1>🥷 Escolha seu Ninja</h1>
+            <p class="character-subtitle">Selecione o modo de jogo e seus guerreiros</p>
+
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="1" id="mode1Btn">🎮 1 Jogador</button>
+                <button class="mode-btn" data-mode="2" id="mode2Btn">👥 2 Jogadores</button>
+            </div>
+
+            <div class="controller-status" id="controllerStatus">
+                <div class="status-item">
+                    <span>🎮 Controle 1:</span>
+                    <span class="dot off" id="ctrl1Dot"></span>
+                    <span id="ctrl1Name">Desconectado</span>
+                </div>
+                <div class="status-item">
+                    <span>🎮 Controle 2:</span>
+                    <span class="dot off" id="ctrl2Dot"></span>
+                    <span id="ctrl2Name">Desconectado</span>
+                </div>
+            </div>
+
+            <div class="character-grid" id="characterGrid"></div>
+
+            <div class="character-actions">
+                <button id="confirmCharacterBtn" class="confirm-btn">⚔️ Confirmar e Jogar</button>
+                <button id="backToLoginBtn" class="back-btn">← Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA DE ESCOLHA DE PODERES -->
+    <div id="powerSelectScreen" class="power-select-screen">
+        <div class="power-select-container">
+            <h1>⚡ ESCOLHA SEU PODER</h1>
+            <p class="sub">Selecione um poder para ajudá-lo na jornada!</p>
+            <div class="power-select-grid" id="powerSelectGrid">
+                <!-- Inserido via JS -->
+            </div>
+            <div class="power-select-actions">
+                <button id="powerSelectConfirm" class="power-select-btn">⚔️ Confirmar Poder</button>
+                <button id="powerSelectSkip" class="power-select-skip">⏭ Pular</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA DO JOGO -->
+    <div id="gameScreen" class="game-screen" style="display:none;">
+        <div class="game-container" id="gameContainer">
+            <div class="game-header">
+                <div class="game-header-left">
+                    <h1><span id="characterIcon">🥷</span> <span id="phaseDisplay">Fase 1</span></h1>
+                    <span class="phase-name" id="phaseName">🌲 Floresta dos Iniciantes</span>
+                    <span id="difficultyBadge"
+                        style="font-size:0.7rem;padding:2px 10px;border-radius:10px;background:#4CAF50;color:white;">FÁCIL</span>
+                </div>
+                <div class="game-header-right">
+                    <span class="user-info">👤 <span id="userDisplay">Usuário</span></span>
+                    <span id="modeDisplay" class="user-info" style="color:#f5c842;">🎮 1P</span>
+                    <span class="controller-indicator" id="ctrlIndicator">
+                        <span class="dot off" id="ctrlDot"></span>
+                        <span id="ctrlStatusText">Gamepad</span>
+                    </span>
+                    <button id="fullscreenBtn" class="fullscreen-btn">⛶ Tela Cheia</button>
+                    <button id="logoutBtn" class="logout-btn">🚪 Sair</button>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="900" height="600"></canvas>
+
+            <div class="power-bar" id="powerBar">
+                <span class="power-label">⚡ PODERES:</span>
+                <div class="power-slots" id="powerSlots"></div>
+                <span class="power-label" style="font-size:0.7rem;color:#888;" id="comboDisplay">💥 Combo: x1</span>
+            </div>
+
+            <!-- GAMEPAD LAYOUT -->
+            <div class="gamepad-layout">
+                <div class="gp-col">
+                    <span style="color:#e94560;">🔴 P1</span>
+                    <div>
+                        <span class="gp-btn dash">A ⚡</span>
+                        <span class="gp-btn attack">B 🗡️</span>
+                        <span class="gp-btn power">X ⭐</span>
+                    </div>
+                    <span style="font-size:0.6rem;color:#666;">Dash | Atk | Poder</span>
+                </div>
+                <div class="gp-col" id="gpP2" style="display:none;">
+                    <span style="color:#2196F3;">🔵 P2</span>
+                    <div>
+                        <span class="gp-btn dash">A ⚡</span>
+                        <span class="gp-btn attack">B 🗡️</span>
+                        <span class="gp-btn power">X ⭐</span>
+                    </div>
+                    <span style="font-size:0.6rem;color:#666;">Dash | Atk | Poder</span>
+                </div>
+            </div>
+
+            <div class="controls-info">
+                <div class="key-group p1">
+                    <span style="color:#e94560;">🔴 P1:</span>
+                    <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+                    <span>|</span>
+                    <kbd style="color:#e94560;border-color:#e94560;">⇧ Shift</kbd> <span
+                        style="font-size:0.6rem;">Dash</span>
+                    <kbd>E</kbd> <span style="font-size:0.6rem;">Atk</span>
+                    <kbd>Q</kbd> <span style="font-size:0.6rem;">Poder</span>
+                </div>
+                <div class="key-group p2" id="p2ControlsInfo" style="display:none;">
+                    <span style="color:#2196F3;">🔵 P2:</span>
+                    <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>
+                    <span>|</span>
+                    <kbd style="color:#2196F3;border-color:#2196F3;">Shift</kbd> <span
+                        style="font-size:0.6rem;">Dash</span>
+                    <kbd>Enter</kbd> <span style="font-size:0.6rem;">Atk</span>
+                    <kbd>Ctrl</kbd> <span style="font-size:0.6rem;">Poder</span>
+                </div>
+            </div>
+
+            <div class="mobile-controls" id="mobileControls">
+                <div class="controls-container">
+                    <div class="controls-group p1">
+                        <span class="group-label">🔴 P1</span>
+                        <div class="dpad">
+                            <button class="ctrl-btn" id="p1Up">▲</button>
+                            <div class="dpad-row">
+                                <button class="ctrl-btn" id="p1Left">◀</button>
+                                <button class="ctrl-btn" id="p1Down">▼</button>
+                                <button class="ctrl-btn" id="p1Right">▶</button>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="ctrl-btn action-btn" id="p1Dash"
+                                style="background:rgba(255,165,0,0.3);border-color:#ffa500;">⚡</button>
+                            <button class="ctrl-btn action-btn" id="p1Attack">🗡️</button>
+                            <button class="ctrl-btn action-btn" id="p1Power"
+                                style="background:rgba(245,200,66,0.3);border-color:#f5c842;">🌟</button>
+                        </div>
+                        <span class="gamepad-hint">🎮 Use o Gamepad!</span>
+                    </div>
+
+                    <div class="controls-group p2" id="p2Controls" style="display:none;">
+                        <span class="group-label">🔵 P2</span>
+                        <div class="dpad">
+                            <button class="ctrl-btn p2-btn" id="p2Up">▲</button>
+                            <div class="dpad-row">
+                                <button class="ctrl-btn p2-btn" id="p2Left">◀</button>
+                                <button class="ctrl-btn p2-btn" id="p2Down">▼</button>
+                                <button class="ctrl-btn p2-btn" id="p2Right">▶</button>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="ctrl-btn p2-btn action-btn" id="p2Dash"
+                                style="background:rgba(255,165,0,0.3);border-color:#ffa500;">⚡</button>
+                            <button class="ctrl-btn p2-btn action-btn" id="p2Attack">🗡️</button>
+                            <button class="ctrl-btn p2-btn action-btn" id="p2Power"
+                                style="background:rgba(33,150,243,0.3);border-color:#2196F3;">🌟</button>
+                        </div>
+                        <span class="gamepad-hint">🎮 Use o 2º Gamepad!</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-left">
+                    <span id="characterStatusIcon">🥷</span> <span id="ninjaStatus">▶ Andando</span>
+                </div>
+                <div class="info-center">
+                    <span class="p1-score">🔴 <span id="p1ScoreDisplay">0</span></span>
+                    <span class="p2-score" id="p2ScoreLabel" style="display:none;">🔵 <span
+                            id="p2ScoreDisplay">0</span></span>
+                    <span>🎯 <span id="remainingDisplay">0</span></span>
+                    <span>💀 <span id="enemiesDisplay">0</span></span>
+                    <span>⭐ <span id="coinsDisplay">0</span></span>
+                </div>
+                <div class="info-right">
+                    <button id="resetBtn">↺ Resetar Fase</button>
+                    <button id="nextPhaseBtn" class="next-btn" style="display:none;">▶ Próxima Fase</button>
+                </div>
+            </div>
+
+            <div class="phase-selector" id="phaseSelector">
+                <button class="phase-btn" data-phase="1">1</button>
+                <button class="phase-btn" data-phase="2">2</button>
+                <button class="phase-btn" data-phase="3">3</button>
+                <button class="phase-btn" data-phase="4">4</button>
+                <button class="phase-btn" data-phase="5">5</button>
+                <button class="phase-btn" data-phase="6">6</button>
+                <button class="phase-btn" data-phase="7">7</button>
+                <button class="phase-btn" data-phase="8">8</button>
+                <button class="phase-btn" data-phase="9">9</button>
+                <button class="phase-btn" data-phase="10" style="border-color:#e94560;color:#e94560;">👑</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="achievementNotification" class="achievement-notification">
+        <div style="display:flex;align-items:center;">
+            <span class="ach-icon" id="achIcon">🏆</span>
+            <div>
+                <div class="ach-title" id="achTitle">Conquista Desbloqueada!</div>
+                <div class="ach-desc" id="achDesc">Você completou uma conquista</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // SISTEMA DE LOGIN LOCAL
+        // ============================================================
+
+        let localUsers = JSON.parse(localStorage.getItem('ninjaUsers')) || {
+            'ninja': { password: '123456', score: 0, phase: 1, character: 0, powers: 0, coins: 0, achievements: [] },
+            'samurai': { password: '654321', score: 0, phase: 1, character: 1, powers: 0, coins: 0, achievements: [] }
+        };
+
+        function saveUsers() {
+            localStorage.setItem('ninjaUsers', JSON.stringify(localUsers));
+        }
+
+        // ============================================================
+        // 8 NINJAS
+        // ============================================================
+        const CHARACTERS = [
+            { id: 0, name: 'Ninja Vermelho', color: '#e94560', symbol: '🔥', desc: 'Veloz e ágil', icon: '🥷' },
+            { id: 1, name: 'Samurai Azul', color: '#2196F3', symbol: '⚡', desc: 'Força e honra', icon: '⚔️' },
+            { id: 2, name: 'Sensei Verde', color: '#4CAF50', symbol: '🍃', desc: 'Sabedoria ancestral', icon: '🧘' },
+            { id: 3, name: 'Sombra Negra', color: '#9C27B0', symbol: '🌙', desc: 'Furtivo e mortal', icon: '👻' },
+            { id: 4, name: 'Fênix Dourada', color: '#FF6F00', symbol: '☀️', desc: 'Renascimento e poder', icon: '🦅' },
+            { id: 5, name: 'Dragão Celeste', color: '#00BCD4', symbol: '🐉', desc: 'Domínio dos céus', icon: '🌊' },
+            { id: 6, name: 'Tigre Branco', color: '#EEEEEE', symbol: '🐯', desc: 'Força bruta e destreza', icon: '⚪' },
+            { id: 7, name: 'Lobo Noturno', color: '#607D8B', symbol: '🐺', desc: 'Caçador das trevas', icon: '🌙' }
+        ];
+
+        // ============================================================
+        // 8 PODERES
+        // ============================================================
+        const POWERS = [
+            { id: 0, name: 'Fúria Flamejante', icon: '🔥', desc: 'Ataque +50%', color: '#e94560' },
+            { id: 1, name: 'Velocidade Fantasma', icon: '💨', desc: 'Dash duplo', color: '#2196F3' },
+            { id: 2, name: 'Escudo Divino', icon: '🛡️', desc: 'Proteção total', color: '#4CAF50' },
+            { id: 3, name: 'Lâmina Sombria', icon: '🌙', desc: 'Crítico +100%', color: '#9C27B0' },
+            { id: 4, name: 'Fênix Renascida', icon: '☀️', desc: 'Revive com 50% HP', color: '#FF6F00' },
+            { id: 5, name: 'Tempestade Celeste', icon: '🌊', desc: 'Ataque em área', color: '#00BCD4' },
+            { id: 6, name: 'Garra do Tigre', icon: '🐯', desc: 'Dano em cadeia', color: '#EEEEEE' },
+            { id: 7, name: 'Uivo Noturno', icon: '🐺', desc: 'Furtividade total', color: '#607D8B' }
+        ];
+
+        // ============================================================
+        // PODERES DA ESPADA LENDÁRIA
+        // ============================================================
+        const LEGENDARY_POWERS = [
+            { id: 'fire', name: '🔥 Fúria do Dragão', desc: 'Ataque em área +100%', icon: '🔥' },
+            { id: 'ice', name: '❄️ Gelo Eterno', desc: 'Congela inimigos por 3s', icon: '❄️' },
+            { id: 'lightning', name: '⚡ Raio Celeste', desc: 'Crítico garantido', icon: '⚡' },
+            { id: 'shadow', name: '🌑 Sombra Mortal', desc: 'Furtividade + dano crítico', icon: '🌑' },
+            { id: 'holy', name: '✨ Luz Divina', desc: 'Cura + escudo', icon: '✨' },
+            { id: 'dragon', name: '🐉 Alma do Dragão', desc: 'Todos os poderes combinados', icon: '🐉' }
+        ];
+
+        // ============================================================
+        // CONQUISTAS
+        // ============================================================
+        const ACHIEVEMENTS = [
+            { id: 'first_kill', name: 'Primeira Vitória', desc: 'Derrote seu primeiro inimigo', icon: '⚔️' },
+            { id: 'collector', name: 'Colecionador', desc: 'Colete 50 itens', icon: '✨' },
+            { id: 'power_user', name: 'Mestre dos Poderes', desc: 'Use 10 poderes', icon: '🌟' },
+            { id: 'phase_master', name: 'Mestre das Fases', desc: 'Complete 5 fases', icon: '🏆' },
+            { id: 'combo_king', name: 'Rei do Combo', desc: 'Faça um combo x10', icon: '💥' },
+            { id: 'ninja_legend', name: 'Lenda Ninja', desc: 'Complete todas as fases', icon: '🥷' }
+        ];
+
+        // ============================================================
+        // FASES - 9 FÁCEIS + 1 CHEFÃO
+        // ============================================================
+        const PHASES = {
+            1: {
+                name: '🌲 Floresta dos Iniciantes', enemies: 2, collectibles: 6, difficulty: 'Fácil', bg: '#3a6b4f',
+                boss: false
+            },
+            2: {
+                name: '🌑 Vale das Sombras', enemies: 3, collectibles: 8, difficulty: 'Fácil', bg: '#2d4059',
+                boss: false
+            },
+            3: {
+                name: '🏯 Templo Antigo', enemies: 3, collectibles: 10, difficulty: 'Fácil', bg: '#4a3f2b',
+                boss: false
+            },
+            4: {
+                name: '🌫️ Pântano Nebuloso', enemies: 4, collectibles: 12, difficulty: 'Fácil', bg: '#2d4a3e',
+                boss: false
+            },
+            5: {
+                name: '⛰️ Montanha dos Ventos', enemies: 4, collectibles: 13, difficulty: 'Fácil', bg: '#4a4a5a',
+                boss: false
+            },
+            6: {
+                name: '🕳️ Caverna dos Eco', enemies: 5, collectibles: 14, difficulty: 'Fácil', bg: '#2a2a3a',
+                boss: false
+            },
+            7: {
+                name: '🏜️ Deserto das Almas', enemies: 5, collectibles: 15, difficulty: 'Fácil', bg: '#5a4a2a',
+                boss: false
+            },
+            8: {
+                name: '🏰 Castelo do Dragão', enemies: 6, collectibles: 16, difficulty: 'Fácil', bg: '#3a2a3a',
+                boss: false
+            },
+            9: {
+                name: '🌀 Portal dos Deuses', enemies: 6, collectibles: 18, difficulty: 'Fácil', bg: '#2a3a5a',
+                boss: false
+            },
+            10: {
+                name: '👹 CHEFÃO DAS TREVAS', enemies: 1, collectibles: 8, difficulty: '🔥 DIFÍCIL', bg: '#1a0a0a',
+                boss: true
+            }
+        };
+
+        let currentUser = null;
+        let currentPhase = 1;
+        let totalScore = 0;
+        let selectedCharacter = 0;
+        let characterData = null;
+        let unlockedPowers = 0;
+        let gameMode = 1;
+        let selectedP2Character = 1;
+        let p2CharacterData = null;
+        let p2Score = 0;
+        let p2Active = false;
+        let coins = 0;
+        let unlockedAchievements = [];
+        let comboCount = 0;
+        let maxCombo = 0;
+        let totalKills = 0;
+        let totalCollects = 0;
+        let totalPowersUsed = 0;
+        let phasesCompleted = 0;
+        let legendarySwordActive = false;
+        let legendaryPowerSelected = null;
+        let showPowerSelect = false;
+
+        // ============================================================
+        // SISTEMA DE GAMEPAD
+        // ============================================================
+
+        let gamepad1Connected = false;
+        let gamepad2Connected = false;
+        let gamepad1Id = '';
+        let gamepad2Id = '';
+        let gamepadState = {
+            p1: { left: false, right: false, up: false, down: false, dash: false, attack: false, power: false },
+            p2: { left: false, right: false, up: false, down: false, dash: false, attack: false, power: false }
+        };
+
+        const GP_BUTTONS = {
+            A: 0, B: 1, X: 2, Y: 3,
+            LB: 4, RB: 5, LT: 6, RT: 7,
+            SELECT: 8, START: 9, L3: 10, R3: 11,
+            DPAD_UP: 12, DPAD_DOWN: 13, DPAD_LEFT: 14, DPAD_RIGHT: 15,
+            HOME: 16
+        };
+
+        const GP_AXES = { LEFT_X: 0, LEFT_Y: 1, RIGHT_X: 2, RIGHT_Y: 3, LT: 4, RT: 5 };
+
+        function updateGamepadStatus() {
+            const ctrl1Dot = document.getElementById('ctrl1Dot');
+            const ctrl1Name = document.getElementById('ctrl1Name');
+            const ctrl2Dot = document.getElementById('ctrl2Dot');
+            const ctrl2Name = document.getElementById('ctrl2Name');
+            const ctrlDot = document.getElementById('ctrlDot');
+            const ctrlStatusText = document.getElementById('ctrlStatusText');
+
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+
+            if (gamepads[0]) {
+                gamepad1Connected = true;
+                gamepad1Id = gamepads[0].id || 'Gamepad';
+                if (ctrl1Dot) ctrl1Dot.className = 'dot on';
+                if (ctrl1Name) ctrl1Name.textContent = gamepad1Id.substring(0, 18);
+                if (ctrlDot) ctrlDot.className = 'dot on';
+                if (ctrlStatusText) ctrlStatusText.textContent = '🎮 ' + gamepad1Id.substring(0, 12);
+            } else {
+                gamepad1Connected = false;
+                if (ctrl1Dot) ctrl1Dot.className = 'dot off';
+                if (ctrl1Name) ctrl1Name.textContent = 'Desconectado';
+                if (ctrlDot) ctrlDot.className = 'dot off';
+                if (ctrlStatusText) ctrlStatusText.textContent = 'Gamepad Desconectado';
+            }
+
+            if (gamepads[1]) {
+                gamepad2Connected = true;
+                gamepad2Id = gamepads[1].id || 'Gamepad 2';
+                if (ctrl2Dot) ctrl2Dot.className = 'dot on';
+                if (ctrl2Name) ctrl2Name.textContent = gamepad2Id.substring(0, 18);
+            } else {
+                gamepad2Connected = false;
+                if (ctrl2Dot) ctrl2Dot.className = 'dot off';
+                if (ctrl2Name) ctrl2Name.textContent = 'Desconectado';
+            }
+        }
+
+        function processGamepadInput() {
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+
+            if (gamepads[0]) {
+                const gp = gamepads[0];
+                const state = gamepadState.p1;
+
+                state.left = gp.buttons[GP_BUTTONS.DPAD_LEFT]?.pressed || false;
+                state.right = gp.buttons[GP_BUTTONS.DPAD_RIGHT]?.pressed || false;
+                state.up = gp.buttons[GP_BUTTONS.DPAD_UP]?.pressed || false;
+                state.down = gp.buttons[GP_BUTTONS.DPAD_DOWN]?.pressed || false;
+
+                const deadZone = 0.2;
+                const lx = gp.axes[GP_AXES.LEFT_X] || 0;
+                const ly = gp.axes[GP_AXES.LEFT_Y] || 0;
+
+                if (Math.abs(lx) > deadZone) {
+                    if (lx < -0.3) state.left = true;
+                    else if (lx > 0.3) state.right = true;
+                }
+                if (Math.abs(ly) > deadZone) {
+                    if (ly < -0.3) state.up = true;
+                    else if (ly > 0.3) state.down = true;
+                }
+
+                state.dash = gp.buttons[GP_BUTTONS.A]?.pressed || false;
+                state.attack = gp.buttons[GP_BUTTONS.B]?.pressed || false;
+                state.power = gp.buttons[GP_BUTTONS.X]?.pressed || false;
+
+                if (gp.buttons[GP_BUTTONS.LB]?.pressed) state.dash = true;
+                if (gp.buttons[GP_BUTTONS.RB]?.pressed) state.attack = true;
+            }
+
+            if (gameMode === 2 && gamepads[1]) {
+                const gp = gamepads[1];
+                const state = gamepadState.p2;
+
+                state.left = gp.buttons[GP_BUTTONS.DPAD_LEFT]?.pressed || false;
+                state.right = gp.buttons[GP_BUTTONS.DPAD_RIGHT]?.pressed || false;
+                state.up = gp.buttons[GP_BUTTONS.DPAD_UP]?.pressed || false;
+                state.down = gp.buttons[GP_BUTTONS.DPAD_DOWN]?.pressed || false;
+
+                const deadZone = 0.2;
+                const lx = gp.axes[GP_AXES.LEFT_X] || 0;
+                const ly = gp.axes[GP_AXES.LEFT_Y] || 0;
+
+                if (Math.abs(lx) > deadZone) {
+                    if (lx < -0.3) state.left = true;
+                    else if (lx > 0.3) state.right = true;
+                }
+                if (Math.abs(ly) > deadZone) {
+                    if (ly < -0.3) state.up = true;
+                    else if (ly > 0.3) state.down = true;
+                }
+
+                state.dash = gp.buttons[GP_BUTTONS.A]?.pressed || false;
+                state.attack = gp.buttons[GP_BUTTONS.B]?.pressed || false;
+                state.power = gp.buttons[GP_BUTTONS.X]?.pressed || false;
+
+                if (gp.buttons[GP_BUTTONS.LB]?.pressed) state.dash = true;
+                if (gp.buttons[GP_BUTTONS.RB]?.pressed) state.attack = true;
+            } else if (gameMode === 1) {
+                gamepadState.p2 = {
+                    left: false, right: false, up: false, down: false, dash: false, attack: false,
+                    power: false
+                };
+            }
+        }
+
+        setInterval(updateGamepadStatus, 500);
+
+        // ============================================================
+        // LOGIN E REGISTRO
+        // ============================================================
+
+        const loginScreen = document.getElementById('loginScreen');
+        const characterScreen = document.getElementById('characterScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const powerSelectScreen = document.getElementById('powerSelectScreen');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const registerSuccess = document.getElementById('registerSuccess');
+        const userDisplay = document.getElementById('userDisplay');
+        const phaseDisplay = document.getElementById('phaseDisplay');
+        const phaseName = document.getElementById('phaseName');
+        const difficultyBadge = document.getElementById('difficultyBadge');
+        const p1ScoreDisplay = document.getElementById('p1ScoreDisplay');
+        const p2ScoreDisplay = document.getElementById('p2ScoreDisplay');
+        const p2ScoreLabel = document.getElementById('p2ScoreLabel');
+        const remainingDisplay = document.getElementById('remainingDisplay');
+        const enemiesDisplay = document.getElementById('enemiesDisplay');
+        const coinsDisplay = document.getElementById('coinsDisplay');
+        const nextPhaseBtn = document.getElementById('nextPhaseBtn');
+        const characterIcon = document.getElementById('characterIcon');
+        const characterStatusIcon = document.getElementById('characterStatusIcon');
+        const characterGrid = document.getElementById('characterGrid');
+        const powerSlots = document.getElementById('powerSlots');
+        const gameContainer = document.getElementById('gameContainer');
+        const modeDisplay = document.getElementById('modeDisplay');
+        const p2Controls = document.getElementById('p2Controls');
+        const p2ControlsInfo = document.getElementById('p2ControlsInfo');
+        const gpP2 = document.getElementById('gpP2');
+        const comboDisplay = document.getElementById('comboDisplay');
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+                document.getElementById(tab === 'login' ? 'loginForm' : 'registerForm').classList.add('active');
+                document.getElementById('loginError').textContent = '';
+                document.getElementById('registerError').textContent = '';
+                document.getElementById('registerSuccess').textContent = '';
+            });
+        });
+
+        document.getElementById('mode1Btn').addEventListener('click', function () {
+            gameMode = 1;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            p2Controls.style.display = 'none';
+            p2ControlsInfo.style.display = 'none';
+            gpP2.style.display = 'none';
+            p2ScoreLabel.style.display = 'none';
+            renderCharacters();
+        });
+
+        document.getElementById('mode2Btn').addEventListener('click', function () {
+            gameMode = 2;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            p2Controls.style.display = 'flex';
+            p2ControlsInfo.style.display = 'flex';
+            gpP2.style.display = 'block';
+            p2ScoreLabel.style.display = 'inline';
+            renderCharacters();
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value.trim();
+
+            loginError.textContent = '';
+
+            if (!username || !password) {
+                loginError.textContent = '❌ Preencha todos os campos!';
+                return false;
+            }
+
+            if (localUsers[username] && localUsers[username].password === password) {
+                currentUser = {
+                    username: username,
+                    ...localUsers[username]
+                };
+                totalScore = currentUser.score || 0;
+                currentPhase = currentUser.phase || 1;
+                selectedCharacter = currentUser.character || 0;
+                unlockedPowers = currentUser.powers || 0;
+                coins = currentUser.coins || 0;
+                unlockedAchievements = currentUser.achievements || [];
+                loginError.textContent = '';
+                showCharacterSelection();
+                return false;
+            } else {
+                loginError.textContent = '❌ Usuário ou senha incorretos!';
+                return false;
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUser').value.trim();
+            const password = document.getElementById('registerPass').value.trim();
+            const confirm = document.getElementById('registerPassConfirm').value.trim();
+
+            registerError.textContent = '';
+            registerSuccess.textContent = '';
+
+            if (!username || !password || !confirm) {
+                registerError.textContent = '❌ Preencha todos os campos!';
+                return false;
+            }
+
+            if (username.length < 3) {
+                registerError.textContent = '❌ Usuário deve ter pelo menos 3 caracteres!';
+                return false;
+            }
+
+            if (password.length < 4) {
+                registerError.textContent = '❌ Senha deve ter pelo menos 4 caracteres!';
+                return false;
+            }
+
+            if (password !== confirm) {
+                registerError.textContent = '❌ Senhas não coincidem!';
+                return false;
+            }
+
+            if (localUsers[username]) {
+                registerError.textContent = '❌ Usuário já existe!';
+                return false;
+            }
+
+            localUsers[username] = {
+                password: password,
+                score: 0,
+                phase: 1,
+                character: 0,
+                powers: 0,
+                coins: 0,
+                achievements: []
+            };
+            saveUsers();
+
+            registerSuccess.textContent = '✅ Conta criada com sucesso! Faça login.';
+            registerError.textContent = '';
+
+            document.getElementById('registerUser').value = '';
+            document.getElementById('registerPass').value = '';
+            document.getElementById('registerPassConfirm').value = '';
+
+            document.querySelector('.tab-btn[data-tab="login"]').click();
+
+            return false;
+        }
+
+        function showCharacterSelection() {
+            loginScreen.style.display = 'none';
+            characterScreen.style.display = 'flex';
+            renderCharacters();
+            updateGamepadStatus();
+        }
+
+        function renderCharacters() {
+            characterGrid.innerHTML = '';
+            const chars = CHARACTERS;
+
+            chars.forEach((char, index) => {
+                const div = document.createElement('div');
+                const isP1Selected = index === selectedCharacter;
+                const isP2Selected = index === selectedP2Character && gameMode === 2;
+                const isSelected = isP1Selected || isP2Selected;
+
+                div.className = `character-card ${isSelected ? 'selected' : ''}`;
+                div.style.borderColor = isSelected ? char.color : '#333';
+
+                let tags = '';
+                if (isP1Selected) tags += '<span class="player-tag">P1</span>';
+                if (isP2Selected && gameMode === 2) tags += '<span class="player-tag p2">P2</span>';
+
+                div.innerHTML = `
+                    ${tags}
+                    <div class="character-icon" style="background: ${char.color}20; border-color: ${char.color}">
+                        ${char.icon}
+                    </div>
+                    <div class="character-name" style="color: ${char.color}">${char.name}</div>
+                    <div class="character-symbol">${char.symbol}</div>
+                    <div class="character-desc">${char.desc}</div>
+                    ${isSelected ? '<div class="character-check">✅</div>' : ''}
+                `;
+
+                div.addEventListener('click', () => {
+                    if (gameMode === 1) {
+                        selectedCharacter = index;
+                        renderCharacters();
+                    } else {
+                        if (selectedCharacter === -1) {
+                            selectedCharacter = index;
+                        } else if (selectedP2Character === -1) {
+                            selectedP2Character = index;
+                        } else if (selectedCharacter === index) {
+                            selectedCharacter = -1;
+                        } else if (selectedP2Character === index) {
+                            selectedP2Character = -1;
+                        } else {
+                            selectedCharacter = index;
+                        }
+                        renderCharacters();
+                    }
+                });
+
+                characterGrid.appendChild(div);
+            });
+        }
+
+        document.getElementById('confirmCharacterBtn').addEventListener('click', function () {
+            if (gameMode === 1) {
+                if (selectedCharacter < 0) {
+                    alert('Selecione um personagem!');
+                    return;
+                }
+                characterData = CHARACTERS[selectedCharacter];
+                p2Active = false;
+                p2CharacterData = null;
+            } else {
+                if (selectedCharacter < 0 || selectedP2Character < 0) {
+                    alert('Selecione um personagem para cada jogador!');
+                    return;
+                }
+                characterData = CHARACTERS[selectedCharacter];
+                p2CharacterData = CHARACTERS[selectedP2Character];
+                p2Active = true;
+                p2Score = 0;
+            }
+
+            if (currentUser) {
+                localUsers[currentUser.username].character = selectedCharacter;
+                saveUsers();
+            }
+
+            characterScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            userDisplay.textContent = currentUser.username;
+            modeDisplay.textContent = gameMode === 1 ? '🎮 1P' : '👥 2P';
+
+            if (gameMode === 2) {
+                p2Controls.style.display = 'flex';
+                p2ControlsInfo.style.display = 'flex';
+                gpP2.style.display = 'block';
+                p2ScoreLabel.style.display = 'inline';
+            } else {
+                p2Controls.style.display = 'none';
+                p2ControlsInfo.style.display = 'none';
+                gpP2.style.display = 'none';
+                p2ScoreLabel.style.display = 'none';
+            }
+
+            updatePhaseUI();
+            updatePowerUI();
+            initGame();
+            enterFullscreen();
+        });
+
+        document.getElementById('backToLoginBtn').addEventListener('click', function () {
+            characterScreen.style.display = 'none';
+            loginScreen.style.display = 'flex';
+        });
+
+        // ========== FULLSCREEN ==========
+        function enterFullscreen() {
+            const container = gameContainer;
+            container.classList.add('fullscreen-mode');
+            const btn = document.getElementById('fullscreenBtn');
+            btn.textContent = '⛶ Sair Tela Cheia';
+            btn.classList.add('active');
+        }
+
+        function exitFullscreen() {
+            const container = gameContainer;
+            container.classList.remove('fullscreen-mode');
+            const btn = document.getElementById('fullscreenBtn');
+            btn.textContent = '⛶ Tela Cheia';
+            btn.classList.remove('active');
+        }
+
+        document.getElementById('fullscreenBtn').addEventListener('click', function () {
+            const container = gameContainer;
+            if (container.classList.contains('fullscreen-mode')) {
+                exitFullscreen();
+            } else {
+                enterFullscreen();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F11') {
+                e.preventDefault();
+                const container = gameContainer;
+                if (container.classList.contains('fullscreen-mode')) {
+                    exitFullscreen();
+                } else {
+                    enterFullscreen();
+                }
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            exitFullscreen();
+            currentUser = null;
+            loginScreen.style.display = 'flex';
+            gameScreen.style.display = 'none';
+            characterScreen.style.display = 'none';
+            loginError.textContent = '';
+        });
+
+        // ========== ACHIEVEMENT SYSTEM ==========
+        function checkAchievements() {
+            const newAchievements = [];
+
+            if (totalKills >= 1 && !unlockedAchievements.includes('first_kill')) {
+                newAchievements.push('first_kill');
+            }
+            if (totalCollects >= 50 && !unlockedAchievements.includes('collector')) {
+                newAchievements.push('collector');
+            }
+            if (totalPowersUsed >= 10 && !unlockedAchievements.includes('power_user')) {
+                newAchievements.push('power_user');
+            }
+            if (phasesCompleted >= 5 && !unlockedAchievements.includes('phase_master')) {
+                newAchievements.push('phase_master');
+            }
+            if (maxCombo >= 10 && !unlockedAchievements.includes('combo_king')) {
+                newAchievements.push('combo_king');
+            }
+            if (currentPhase > 10 && !unlockedAchievements.includes('ninja_legend')) {
+                newAchievements.push('ninja_legend');
+            }
+
+            for (let achId of newAchievements) {
+                const ach = ACHIEVEMENTS.find(a => a.id === achId);
+                if (ach && !unlockedAchievements.includes(achId)) {
+                    unlockedAchievements.push(achId);
+                    showAchievementNotification(ach);
+                    if (currentUser) {
+                        localUsers[currentUser.username].achievements = unlockedAchievements;
+                        saveUsers();
+                    }
+                }
+            }
+        }
+
+        function showAchievementNotification(ach) {
+            const notification = document.getElementById('achievementNotification');
+            document.getElementById('achIcon').textContent = ach.icon || '🏆';
+            document.getElementById('achTitle').textContent = '🏆 ' + ach.name;
+            document.getElementById('achDesc').textContent = ach.desc;
+
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function updatePowerUI() {
+            powerSlots.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const slot = document.createElement('div');
+                slot.className = `power-slot ${i < unlockedPowers ? 'active' : 'locked'}`;
+                if (i < unlockedPowers) {
+                    slot.textContent = POWERS[i].icon;
+                    slot.title = POWERS[i].name + ': ' + POWERS[i].desc;
+                } else {
+                    slot.textContent = '🔒';
+                    slot.title = 'Desbloqueie na fase ' + ((i + 1) * 2);
+                }
+                powerSlots.appendChild(slot);
+            }
+
+            document.querySelectorAll('.phase-btn').forEach(btn => {
+                const phase = parseInt(btn.dataset.phase);
+                const oldBadge = btn.querySelector('.power-badge');
+                if (oldBadge) oldBadge.remove();
+
+                if (phase % 2 === 0 && phase <= 8) {
+                    const badge = document.createElement('span');
+                    badge.className = 'power-badge';
+                    badge.textContent = '⚡';
+                    badge.title = 'Desbloqueia um poder!';
+                    btn.appendChild(badge);
+                }
+
+                const oldCheck = btn.querySelector('.completion-check');
+                if (oldCheck) oldCheck.remove();
+
+                if (phase <= phasesCompleted) {
+                    const check = document.createElement('span');
+                    check.className = 'completion-check';
+                    check.textContent = '✓';
+                    btn.appendChild(check);
+                }
+            });
+        }
+
+        function updatePhaseUI() {
+            const phase = PHASES[currentPhase];
+            phaseDisplay.textContent = `Fase ${currentPhase}`;
+            phaseName.textContent = phase ? phase.name : 'Fase Final';
+
+            // Atualizar badge de dificuldade
+            if (phase && phase.boss) {
+                difficultyBadge.textContent = '👑 CHEFÃO';
+                difficultyBadge.style.background = '#e94560';
+                difficultyBadge.style.color = 'white';
+            } else {
+                difficultyBadge.textContent = '⭐ FÁCIL';
+                difficultyBadge.style.background = '#4CAF50';
+                difficultyBadge.style.color = 'white';
+            }
+
+            if (characterData) {
+                characterIcon.textContent = characterData.icon;
+                characterStatusIcon.textContent = characterData.icon;
+            }
+
+            document.querySelectorAll('.phase-btn').forEach(btn => {
+                const phaseNum = parseInt(btn.dataset.phase);
+                btn.classList.toggle('active', phaseNum === currentPhase);
+                btn.classList.toggle('locked', phaseNum > currentPhase + 1);
+
+                // Destacar fase 10 (Chefão)
+                if (phaseNum === 10) {
+                    btn.style.borderColor = currentPhase === 10 ? '#e94560' : '#555';
+                    btn.style.color = currentPhase === 10 ? '#e94560' : '#888';
+                }
+            });
+
+            updatePowerUI();
+        }
+
+        // ============================================================
+        // TELA DE ESCOLHA DE PODERES
+        // ============================================================
+        function showPowerSelection() {
+            powerSelectScreen.style.display = 'flex';
+            showPowerSelect = true;
+            renderPowerSelection();
+        }
+
+        function renderPowerSelection() {
+            const grid = document.getElementById('powerSelectGrid');
+            grid.innerHTML = '';
+
+            LEGENDARY_POWERS.forEach((power, index) => {
+                const div = document.createElement('div');
+                div.className = `power-select-card ${index === 0 ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <div class="power-icon">${power.icon}</div>
+                    <div class="power-name">${power.name}</div>
+                    <div class="power-desc">${power.desc}</div>
+                    ${index === 0 ? '<div class="power-check">✅</div>' : ''}
+                `;
+                div.addEventListener('click', () => {
+                    document.querySelectorAll('.power-select-card').forEach(c => c.classList.remove('selected'));
+                    document.querySelectorAll('.power-select-card .power-check').forEach(c => c.remove());
+                    div.classList.add('selected');
+                    const check = document.createElement('div');
+                    check.className = 'power-check';
+                    check.textContent = '✅';
+                    div.appendChild(check);
+                    legendaryPowerSelected = power.id;
+                });
+                grid.appendChild(div);
+            });
+
+            legendaryPowerSelected = LEGENDARY_POWERS[0].id;
+        }
+
+        document.getElementById('powerSelectConfirm').addEventListener('click', function () {
+            if (legendaryPowerSelected) {
+                powerSelectScreen.style.display = 'none';
+                showPowerSelect = false;
+                activateLegendaryPower(legendaryPowerSelected);
+                ninjaStatus.innerText = `⚔️ Poder Lendário Ativado: ${LEGENDARY_POWERS.find(p => p.id === legendaryPowerSelected).name}!`;
+                setTimeout(() => {
+                    if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+                }, 2000);
+            }
+        });
+
+        document.getElementById('powerSelectSkip').addEventListener('click', function () {
+            powerSelectScreen.style.display = 'none';
+            showPowerSelect = false;
+            ninjaStatus.innerText = '⏭ Poder Lendário ignorado';
+            setTimeout(() => {
+                if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+            }, 1500);
+        });
+
+        function activateLegendaryPower(powerId) {
+            legendarySwordActive = true;
+            switch (powerId) {
+                case 'fire':
+                    player.attackMultiplier = 2;
+                    player.hasShield = true;
+                    player.shieldHP = 3;
+                    break;
+                case 'ice':
+                    enemies.forEach(e => { e.speed *= 0.3; });
+                    break;
+                case 'lightning':
+                    player.criticalChance = 1;
+                    player.attackMultiplier = 1.5;
+                    break;
+                case 'shadow':
+                    player.speed = 5;
+                    player.criticalChance = 0.8;
+                    player.dashMultiplier = 2.5;
+                    break;
+                case 'holy':
+                    player.hasShield = true;
+                    player.shieldHP = 10;
+                    player.reviveCount = 2;
+                    break;
+                case 'dragon':
+                    player.attackMultiplier = 2;
+                    player.dashMultiplier = 2;
+                    player.speed = 4.5;
+                    player.criticalChance = 0.7;
+                    player.hasShield = true;
+                    player.shieldHP = 5;
+                    player.reviveCount = 1;
+                    break;
+            }
+            createParticles(player.x, player.y, '#f5c842', 50);
+        }
+
+        // ============= JOGO =============
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const ninjaStatus = document.getElementById('ninjaStatus');
+
+        const W = 900,
+            H = 600;
+        let gameTime = 0;
+        let gameOver = false;
+        let winCondition = false;
+        let enemiesDefeated = 0;
+        let particles = [];
+        let door = { x: 0, y: 0, active: false };
+        let legendarySword = { x: 0, y: 0, active: false, collected: false };
+        let bossWarning = false;
+
+        let trees = [],
+            rocks = [],
+            bushes = [],
+            collectibles = [],
+            enemies = [];
+
+        // ===== PLAYER 1 =====
+        const player = {
+            x: 200,
+            y: 300,
+            radius: 18,
+            speed: 3.2,
+            vx: 0,
+            vy: 0,
+            facing: 'down',
+            isMoving: false,
+            canDash: true,
+            dashCooldown: 0,
+            isDashing: false,
+            dashTimer: 0,
+            isAttacking: false,
+            attackTimer: 0,
+            attackCooldown: 0,
+            hasSword: true,
+            attackMultiplier: 1,
+            dashMultiplier: 1,
+            dashCooldownReduction: 0,
+            hasShield: false,
+            shieldHP: 0,
+            criticalChance: 0,
+            score: 0,
+            reviveCount: 0,
+            trail: [],
+            hp: 5,
+            maxHp: 5,
+            invincible: false,
+            invincibleTimer: 0
+        };
+
+        // ===== PLAYER 2 =====
+        const player2 = {
+            x: 700,
+            y: 300,
+            radius: 18,
+            speed: 3.2,
+            vx: 0,
+            vy: 0,
+            facing: 'up',
+            isMoving: false,
+            canDash: true,
+            dashCooldown: 0,
+            isDashing: false,
+            dashTimer: 0,
+            isAttacking: false,
+            attackTimer: 0,
+            attackCooldown: 0,
+            hasSword: true,
+            attackMultiplier: 1,
+            dashMultiplier: 1,
+            dashCooldownReduction: 0,
+            hasShield: false,
+            shieldHP: 0,
+            criticalChance: 0,
+            score: 0,
+            reviveCount: 0,
+            trail: [],
+            hp: 5,
+            maxHp: 5,
+            invincible: false,
+            invincibleTimer: 0
+        };
+
+        const keys = {
+            p1: { w: false, a: false, s: false, d: false, shift: false, e: false, q: false },
+            p2: { w: false, a: false, s: false, d: false, shift: false, e: false, q: false }
+        };
+
+        function generateWorld(phase) {
+            const phaseData = PHASES[phase] || PHASES[1];
+            trees = [];
+            rocks = [];
+            bushes = [];
+            collectibles = [];
+            enemies = [];
+            enemiesDefeated = 0;
+            particles = [];
+            door.active = false;
+            legendarySword.active = false;
+            legendarySword.collected = false;
+            bossWarning = false;
+
+            // Espada lendária só na fase 5
+            if (phase === 5) {
+                legendarySword.active = true;
+                legendarySword.x = W / 2 - 20;
+                legendarySword.y = H / 2 - 20;
+            }
+
+            // ===== CHEFÃO (FASE 10) =====
+            const isBoss = phase === 10;
+
+            // Árvores (menos na fase do chefão)
+            const treeCount = isBoss ? 10 : 20 + phase * 2;
+            for (let i = 0; i < treeCount; i++) {
+                let x, y, overlap;
+                let attempts = 0;
+                do {
+                    x = 40 + Math.random() * (W - 80);
+                    y = 40 + Math.random() * (H - 80);
+                    overlap = false;
+                    if (Math.hypot(x - 200, y - 300) < 70) overlap = true;
+                    if (Math.hypot(x - 700, y - 300) < 70) overlap = true;
+                    if (legendarySword.active && Math.hypot(x - legendarySword.x, y - legendarySword.y) < 60) overlap =
+                        true;
+                    for (let t of trees) {
+                        if (Math.hypot(x - t.x, y - t.y) < 50) { overlap = true; break; }
+                    }
+                    attempts++;
+                    if (attempts > 100) break;
+                } while (overlap);
+                trees.push({ x, y, radius: 16 + Math.random() * 12 });
+            }
+
+            // Pedras
+            const rockCount = isBoss ? 6 : 12 + phase;
+            for (let i = 0; i < rockCount; i++) {
+                let x, y, overlap;
+                let attempts = 0;
+                do {
+                    x = 30 + Math.random() * (W - 60);
+                    y = 30 + Math.random() * (H - 60);
+                    overlap = false;
+                    if (Math.hypot(x - 200, y - 300) < 60) overlap = true;
+                    if (Math.hypot(x - 700, y - 300) < 60) overlap = true;
+                    if (legendarySword.active && Math.hypot(x - legendarySword.x, y - legendarySword.y) < 50) overlap =
+                        true;
+                    for (let t of trees) {
+                        if (Math.hypot(x - t.x, y - t.y) < 40) { overlap = true; break; }
+                    }
+                    for (let r of rocks) {
+                        if (Math.hypot(x - r.x, y - r.y) < 35) { overlap = true; break; }
+                    }
+                    attempts++;
+                    if (attempts > 100) break;
+                } while (overlap);
+                rocks.push({ x, y, radius: 8 + Math.random() * 10 });
+            }
+
+            // Arbustos
+            const bushCount = isBoss ? 8 : 15 + phase;
+            for (let i = 0; i < bushCount; i++) {
+                let x, y, overlap;
+                let attempts = 0;
+                do {
+                    x = 20 + Math.random() * (W - 40);
+                    y = 20 + Math.random() * (H - 40);
+                    overlap = false;
+                    if (Math.hypot(x - 200, y - 300) < 50) overlap = true;
+                    if (Math.hypot(x - 700, y - 300) < 50) overlap = true;
+                    if (legendarySword.active && Math.hypot(x - legendarySword.x, y - legendarySword.y) < 40) overlap =
+                        true;
+                    for (let t of trees) {
+                        if (Math.hypot(x - t.x, y - t.y) < 35) { overlap = true; break; }
+                    }
+                    attempts++;
+                    if (attempts > 100) break;
+                } while (overlap);
+                bushes.push({ x, y, radius: 10 + Math.random() * 10 });
+            }
+
+            // Colecionáveis
+            const numCollectibles = phaseData.collectibles;
+            for (let i = 0; i < numCollectibles; i++) {
+                let x, y, overlap;
+                let attempts = 0;
+                do {
+                    x = 30 + Math.random() * (W - 60);
+                    y = 30 + Math.random() * (H - 60);
+                    overlap = false;
+                    if (Math.hypot(x - 200, y - 300) < 60) overlap = true;
+                    if (Math.hypot(x - 700, y - 300) < 60) overlap = true;
+                    if (legendarySword.active && Math.hypot(x - legendarySword.x, y - legendarySword.y) < 40) overlap =
+                        true;
+                    for (let t of trees) {
+                        if (Math.hypot(x - t.x, y - t.y) < 40) { overlap = true; break; }
+                    }
+                    for (let r of rocks) {
+                        if (Math.hypot(x - r.x, y - r.y) < 35) { overlap = true; break; }
+                    }
+                    for (let c of collectibles) {
+                        if (Math.hypot(x - c.x, y - c.y) < 30) { overlap = true; break; }
+                    }
+                    attempts++;
+                    if (attempts > 100) break;
+                } while (overlap);
+                collectibles.push({
+                    x,
+                    y,
+                    radius: 10,
+                    collected: false,
+                    type: Math.random() > 0.7 ? 'coin' : (Math.random() > 0.6 ? 'kunai' : 'star'),
+                });
+            }
+
+            // ===== INIMIGOS =====
+            const numEnemies = phaseData.enemies;
+
+            if (isBoss) {
+                // CHEFÃO - 1 inimigo poderoso
+                const bossHp = 10 + Math.floor(Math.random() * 5);
+                enemies.push({
+                    x: W / 2,
+                    y: H / 2,
+                    radius: 40,
+                    speed: 1.2,
+                    directionChange: 0,
+                    patrolAngle: Math.random() * Math.PI * 2,
+                    hp: bossHp,
+                    maxHp: bossHp,
+                    hitTimer: 0,
+                    isDead: false,
+                    type: 'boss',
+                    color: '#8B0000',
+                    damage: 2,
+                    attackCooldown: 0,
+                    shootTimer: 0,
+                    state: 'chase',
+                    targetX: 0,
+                    targetY: 0,
+                    bossPhase: 1,
+                    attackPattern: 0,
+                    fireTimer: 0
+                });
+
+                // Efeito de aviso do chefão
+                bossWarning = true;
+                setTimeout(() => {
+                    bossWarning = false;
+                }, 3000);
+            } else {
+                // Inimigos normais (fáceis)
+                for (let i = 0; i < numEnemies; i++) {
+                    let x, y, overlap;
+                    let attempts = 0;
+                    do {
+                        x = 60 + Math.random() * (W - 120);
+                        y = 60 + Math.random() * (H - 120);
+                        overlap = false;
+                        if (Math.hypot(x - 200, y - 300) < 80) overlap = true;
+                        if (Math.hypot(x - 700, y - 300) < 80) overlap = true;
+                        if (legendarySword.active && Math.hypot(x - legendarySword.x, y - legendarySword.y) < 60) overlap =
+                            true;
+                        for (let t of trees) {
+                            if (Math.hypot(x - t.x, y - t.y) < 50) { overlap = true; break; }
+                        }
+                        for (let r of rocks) {
+                            if (Math.hypot(x - r.x, y - r.y) < 40) { overlap = true; break; }
+                        }
+                        attempts++;
+                        if (attempts > 100) break;
+                    } while (overlap);
+
+                    // Inimigos fáceis (pouca vida e dano)
+                    const types = ['normal', 'rapido'];
+                    const type = types[Math.floor(Math.random() * types.length)];
+
+                    let hp, speed, radius, color, damage;
+
+                    switch (type) {
+                        case 'rapido':
+                            hp = 1;
+                            speed = 1.0 + Math.random() * 0.3;
+                            radius = 12;
+                            color = '#ff6b35';
+                            damage = 1;
+                            break;
+                        default:
+                            hp = 1 + Math.floor(phase / 5);
+                            speed = 0.6 + Math.random() * 0.2;
+                            radius = 16;
+                            color = '#b53b3b';
+                            damage = 1;
+                    }
+
+                    enemies.push({
+                        x,
+                        y,
+                        radius: radius,
+                        speed: speed,
+                        directionChange: 0,
+                        patrolAngle: Math.random() * Math.PI * 2,
+                        hp: hp,
+                        maxHp: hp,
+                        hitTimer: 0,
+                        isDead: false,
+                        type: type,
+                        color: color,
+                        damage: damage,
+                        attackCooldown: 0,
+                        shootTimer: 0,
+                        state: 'patrol',
+                        targetX: 0,
+                        targetY: 0,
+                    });
+                }
+            }
+
+            door.x = W - 80;
+            door.y = H / 2 - 30;
+            door.active = false;
+        }
+
+        function initGame() {
+            gameOver = false;
+            winCondition = false;
+            gameTime = 0;
+            legendarySwordActive = false;
+            legendaryPowerSelected = null;
+
+            player.x = 200;
+            player.y = 300;
+            player.vx = 0;
+            player.vy = 0;
+            player.isMoving = false;
+            player.facing = 'down';
+            player.isDashing = false;
+            player.dashTimer = 0;
+            player.canDash = true;
+            player.dashCooldown = 0;
+            player.isAttacking = false;
+            player.attackTimer = 0;
+            player.attackCooldown = 0;
+            player.attackMultiplier = 1;
+            player.dashMultiplier = 1;
+            player.dashCooldownReduction = 0;
+            player.hasShield = false;
+            player.shieldHP = 0;
+            player.criticalChance = 0;
+            player.score = 0;
+            player.reviveCount = 0;
+            player.trail = [];
+            player.hp = 5;
+            player.maxHp = 5;
+            player.invincible = false;
+            player.invincibleTimer = 0;
+
+            player2.x = 700;
+            player2.y = 300;
+            player2.vx = 0;
+            player2.vy = 0;
+            player2.isMoving = false;
+            player2.facing = 'up';
+            player2.isDashing = false;
+            player2.dashTimer = 0;
+            player2.canDash = true;
+            player2.dashCooldown = 0;
+            player2.isAttacking = false;
+            player2.attackTimer = 0;
+            player2.attackCooldown = 0;
+            player2.attackMultiplier = 1;
+            player2.dashMultiplier = 1;
+            player2.dashCooldownReduction = 0;
+            player2.hasShield = false;
+            player2.shieldHP = 0;
+            player2.criticalChance = 0;
+            player2.score = 0;
+            player2.reviveCount = 0;
+            player2.trail = [];
+            player2.hp = 5;
+            player2.maxHp = 5;
+            player2.invincible = false;
+            player2.invincibleTimer = 0;
+
+            comboCount = 0;
+            comboDisplay.textContent = '💥 Combo: x1';
+
+            ninjaStatus.innerText = '▶ Andando';
+            generateWorld(currentPhase);
+            updateUI();
+            nextPhaseBtn.style.display = 'none';
+
+            // Aviso do chefão
+            if (currentPhase === 10) {
+                setTimeout(() => {
+                    ninjaStatus.innerText = '👹 CUIDADO! CHEFÃO DAS TREVAS APARECEU!';
+                    setTimeout(() => {
+                        if (!gameOver && !winCondition) ninjaStatus.innerText = '⚔️ Enfrente o Chefão!';
+                    }, 2000);
+                }, 500);
+            }
+
+            if (currentPhase === 5) {
+                setTimeout(() => {
+                    showPowerSelection();
+                }, 500);
+            }
+
+            if (currentPhase % 2 === 0 && currentPhase > 0 && currentPhase !== 5 && currentPhase !== 10 && unlockedPowers <
+                8) {
+                unlockedPowers++;
+                if (currentUser) {
+                    localUsers[currentUser.username].powers = unlockedPowers;
+                    saveUsers();
+                }
+                ninjaStatus.innerText = `🌟 NOVO PODER DESBLOQUEADO: ${POWERS[unlockedPowers - 1].name}!`;
+                updatePowerUI();
+                setTimeout(() => {
+                    if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+                }, 2000);
+            }
+        }
+
+        function updateUI() {
+            const remaining = collectibles.filter(c => !c.collected).length;
+            p1ScoreDisplay.textContent = player.score;
+            p2ScoreDisplay.textContent = player2.score;
+            remainingDisplay.textContent = remaining;
+            enemiesDisplay.textContent = enemiesDefeated;
+            coinsDisplay.textContent = coins;
+            updatePhaseUI();
+        }
+
+        function saveProgress() {
+            if (currentUser) {
+                localUsers[currentUser.username].score = totalScore + player.score;
+                localUsers[currentUser.username].phase = currentPhase;
+                localUsers[currentUser.username].powers = unlockedPowers;
+                localUsers[currentUser.username].coins = coins;
+                localUsers[currentUser.username].achievements = unlockedAchievements;
+                saveUsers();
+            }
+        }
+
+        function nextPhase() {
+            if (currentPhase < 10) {
+                phasesCompleted++;
+                currentPhase++;
+                totalScore += 50;
+                coins += 20;
+                checkAchievements();
+                initGame();
+                saveProgress();
+            } else {
+                ninjaStatus.innerText = '🏆 Você completou todas as fases!';
+                checkAchievements();
+            }
+        }
+
+        // ========== CONTROLES ==========
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+
+            if (key === 'w') keys.p1.w = true;
+            if (key === 'a') keys.p1.a = true;
+            if (key === 's') keys.p1.s = true;
+            if (key === 'd') keys.p1.d = true;
+            if (key === 'shift') {
+                e.preventDefault();
+                keys.p1.shift = true;
+            }
+            if (key === 'e') {
+                e.preventDefault();
+                keys.p1.e = true;
+            }
+            if (key === 'q') {
+                e.preventDefault();
+                keys.p1.q = true;
+            }
+
+            if (key === 'arrowup') {
+                e.preventDefault();
+                keys.p2.w = true;
+            }
+            if (key === 'arrowdown') {
+                e.preventDefault();
+                keys.p2.s = true;
+            }
+            if (key === 'arrowleft') {
+                e.preventDefault();
+                keys.p2.a = true;
+            }
+            if (key === 'arrowright') {
+                e.preventDefault();
+                keys.p2.d = true;
+            }
+            if (key === 'shift') {
+                if (e.location === 2) {
+                    e.preventDefault();
+                    keys.p2.shift = true;
+                }
+            }
+            if (key === 'enter') {
+                e.preventDefault();
+                keys.p2.e = true;
+            }
+            if (key === 'control') {
+                e.preventDefault();
+                keys.p2.q = true;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+
+            if (key === 'w') keys.p1.w = false;
+            if (key === 'a') keys.p1.a = false;
+            if (key === 's') keys.p1.s = false;
+            if (key === 'd') keys.p1.d = false;
+            if (key === 'shift') {
+                e.preventDefault();
+                keys.p1.shift = false;
+            }
+            if (key === 'e') {
+                e.preventDefault();
+                keys.p1.e = false;
+            }
+            if (key === 'q') {
+                e.preventDefault();
+                keys.p1.q = false;
+            }
+
+            if (key === 'arrowup') {
+                e.preventDefault();
+                keys.p2.w = false;
+            }
+            if (key === 'arrowdown') {
+                e.preventDefault();
+                keys.p2.s = false;
+            }
+            if (key === 'arrowleft') {
+                e.preventDefault();
+                keys.p2.a = false;
+            }
+            if (key === 'arrowright') {
+                e.preventDefault();
+                keys.p2.d = false;
+            }
+            if (key === 'shift') {
+                if (e.location === 2) {
+                    e.preventDefault();
+                    keys.p2.shift = false;
+                }
+            }
+            if (key === 'enter') {
+                e.preventDefault();
+                keys.p2.e = false;
+            }
+            if (key === 'control') {
+                e.preventDefault();
+                keys.p2.q = false;
+            }
+        });
+
+        // ========== MOBILE CONTROLS ==========
+        function setupMobileButton(id, player, key) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            const start = (e) => {
+                e.preventDefault();
+                if (key === 'shift') keys[player].shift = true;
+                else if (key === 'e') keys[player].e = true;
+                else if (key === 'q') keys[player].q = true;
+                else if (key === 'w') keys[player].w = true;
+                else if (key === 'a') keys[player].a = true;
+                else if (key === 's') keys[player].s = true;
+                else if (key === 'd') keys[player].d = true;
+                btn.classList.add('active');
+            };
+            const end = (e) => {
+                e.preventDefault();
+                if (key === 'shift') keys[player].shift = false;
+                else if (key === 'e') keys[player].e = false;
+                else if (key === 'q') keys[player].q = false;
+                else if (key === 'w') keys[player].w = false;
+                else if (key === 'a') keys[player].a = false;
+                else if (key === 's') keys[player].s = false;
+                else if (key === 'd') keys[player].d = false;
+                btn.classList.remove('active');
+            };
+            btn.addEventListener('touchstart', start);
+            btn.addEventListener('touchend', end);
+            btn.addEventListener('touchcancel', end);
+            btn.addEventListener('mousedown', start);
+            btn.addEventListener('mouseup', end);
+            btn.addEventListener('mouseleave', end);
+        }
+
+        setupMobileButton('p1Up', 'p1', 'w');
+        setupMobileButton('p1Down', 'p1', 's');
+        setupMobileButton('p1Left', 'p1', 'a');
+        setupMobileButton('p1Right', 'p1', 'd');
+        setupMobileButton('p1Dash', 'p1', 'shift');
+        setupMobileButton('p1Attack', 'p1', 'e');
+        setupMobileButton('p1Power', 'p1', 'q');
+
+        setupMobileButton('p2Up', 'p2', 'w');
+        setupMobileButton('p2Down', 'p2', 's');
+        setupMobileButton('p2Left', 'p2', 'a');
+        setupMobileButton('p2Right', 'p2', 'd');
+        setupMobileButton('p2Dash', 'p2', 'shift');
+        setupMobileButton('p2Attack', 'p2', 'e');
+        setupMobileButton('p2Power', 'p2', 'q');
+
+        document.querySelectorAll('.ctrl-btn').forEach(btn => {
+            btn.addEventListener('touchstart', (e) => e.preventDefault());
+        });
+
+        document.querySelectorAll('.phase-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const phase = parseInt(this.dataset.phase);
+                if (phase <= currentPhase + 1) {
+                    currentPhase = phase;
+                    initGame();
+                    saveProgress();
+                } else {
+                    ninjaStatus.innerText = '🔒 Complete a fase anterior primeiro!';
+                }
+            });
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', initGame);
+        nextPhaseBtn.addEventListener('click', nextPhase);
+
+        // ========== LÓGICA DO JOGO ==========
+        function isBlocked(x, y, radius) {
+            for (let t of trees) {
+                if (Math.hypot(x - t.x, y - t.y) < radius + t.radius) return true;
+            }
+            for (let r of rocks) {
+                if (Math.hypot(x - r.x, y - r.y) < radius + r.radius) return true;
+            }
+            if (x - radius < 0 || x + radius > W || y - radius < 0 || y + radius > H) return true;
+            return false;
+        }
+
+        function createParticles(x, y, color, count = 15) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1 + Math.random() * 3;
+                particles.push({
+                    x,
+                    y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 0.5,
+                    life: 30 + Math.random() * 30,
+                    maxLife: 60,
+                    radius: 2 + Math.random() * 4,
+                    color: color,
+                    gravity: 0.05
+                });
+            }
+        }
+
+        function takeDamage(playerObj, damage, isP2) {
+            if (playerObj.invincible) return;
+            if (playerObj.hasShield && playerObj.shieldHP > 0) {
+                playerObj.shieldHP--;
+                createParticles(playerObj.x, playerObj.y, '#4CAF50', 10);
+                return;
+            }
+
+            playerObj.hp -= damage;
+            playerObj.invincible = true;
+            playerObj.invincibleTimer = 30;
+
+            createParticles(playerObj.x, playerObj.y, '#ff0000', 20);
+
+            if (playerObj.hp <= 0) {
+                if (playerObj.reviveCount > 0) {
+                    playerObj.reviveCount--;
+                    playerObj.hp = Math.ceil(playerObj.maxHp / 2);
+                    playerObj.hasShield = true;
+                    playerObj.shieldHP = 3;
+                    createParticles(playerObj.x, playerObj.y, '#FF6F00', 40);
+                    ninjaStatus.innerText = `🔥 ${isP2 ? 'P2' : 'P1'} reviveu!`;
+                } else {
+                    gameOver = true;
+                    ninjaStatus.innerText = `💀 ${isP2 ? 'P2' : 'P1'} Game Over!`;
+                }
+            } else {
+                ninjaStatus.innerText = `❤️ ${isP2 ? 'P2' : 'P1'} HP: ${playerObj.hp}/${playerObj.maxHp}`;
+                setTimeout(() => {
+                    if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+                }, 800);
+            }
+        }
+
+        // ===== ATAQUE =====
+        function performAttackP1() {
+            if (player.isAttacking || player.attackCooldown > 0) return;
+            player.isAttacking = true;
+            player.attackTimer = 15;
+            player.attackCooldown = 20;
+
+            const attackRadius = 55;
+            const multiplier = player.attackMultiplier || 1;
+            const isCritical = Math.random() < (player.criticalChance || 0);
+
+            let hitCount = 0;
+            for (let e of enemies) {
+                if (e.isDead) continue;
+                const dist = Math.hypot(player.x - e.x, player.y - e.y);
+                if (dist < player.radius + e.radius + attackRadius) {
+                    const dx = e.x - player.x;
+                    const dy = e.y - player.y;
+                    let angle = Math.atan2(dy, dx);
+                    let playerAngle = 0;
+                    if (player.facing === 'right') playerAngle = 0;
+                    else if (player.facing === 'down') playerAngle = Math.PI / 2;
+                    else if (player.facing === 'left') playerAngle = Math.PI;
+                    else if (player.facing === 'up') playerAngle = -Math.PI / 2;
+
+                    let diff = angle - playerAngle;
+                    while (diff > Math.PI) diff -= Math.PI * 2;
+                    while (diff < -Math.PI) diff += Math.PI * 2;
+
+                    if (Math.abs(diff) < 1.2) {
+                        let damage = 1;
+                        if (isCritical) damage = 3;
+                        // Dano extra contra chefão
+                        if (e.type === 'boss') damage = Math.ceil(damage * 1.5);
+
+                        e.hp -= Math.ceil(damage * multiplier);
+                        e.hitTimer = 15;
+                        hitCount++;
+
+                        createParticles(e.x, e.y, '#ff6b6b', 15);
+
+                        if (e.hp <= 0) {
+                            e.isDead = true;
+                            const bonus = e.type === 'boss' ? 100 : 30;
+                            player.score += bonus;
+                            enemiesDefeated++;
+                            totalKills++;
+                            comboCount++;
+                            if (comboCount > maxCombo) maxCombo = comboCount;
+
+                            const comboMultiplier = Math.min(comboCount, 5);
+                            const comboBonus = comboMultiplier * 5;
+                            coins += comboBonus;
+
+                            comboDisplay.textContent = `💥 Combo: x${comboMultiplier}`;
+                            comboDisplay.style.color = comboCount >= 5 ? '#f5c842' : '#ff6b6b';
+
+                            if (e.type === 'boss') {
+                                ninjaStatus.innerText = `👑 CHEFÃO DERROTADO! +${bonus + comboBonus}`;
+                                createParticles(e.x, e.y, '#f5c842', 100);
+                            } else {
+                                ninjaStatus.innerText = `⚔️ P1 derrotou inimigo! +${bonus + comboBonus}`;
+                            }
+
+                            checkAchievements();
+                            updateUI();
+                            saveProgress();
+
+                            const allDead = enemies.every(en => en.isDead);
+                            if (allDead) {
+                                door.active = true;
+                                if (currentPhase === 10) {
+                                    ninjaStatus.innerText = '👑 CHEFÃO DERROTADO! Você venceu!';
+                                } else {
+                                    ninjaStatus.innerText = '🚪 Porta aberta! Vá para a próxima fase!';
+                                }
+                                setTimeout(() => {
+                                    if (!gameOver && !winCondition) ninjaStatus.innerText = '🚪 Vá para a porta!';
+                                }, 2000);
+                            }
+                        } else {
+                            if (e.type === 'boss') {
+                                ninjaStatus.innerText =
+                                    `👑 CHEFÃO ATINGIDO! HP: ${e.hp}/${e.maxHp}`;
+                            } else {
+                                ninjaStatus.innerText = `💥 Inimigo atingido! HP: ${e.hp}/${e.maxHp}`;
+                            }
+                            setTimeout(() => {
+                                if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+                            }, 400);
+                        }
+                    }
+                }
+            }
+            if (hitCount === 0) {
+                comboCount = 0;
+                comboDisplay.textContent = '💥 Combo: x1';
+                comboDisplay.style.color = '#888';
+            }
+        }
+
+        function performAttackP2() {
+            if (player2.isAttacking || player2.attackCooldown > 0) return;
+            player2.isAttacking = true;
+            player2.attackTimer = 15;
+            player2.attackCooldown = 20;
+
+            const attackRadius = 55;
+            const multiplier = player2.attackMultiplier || 1;
+            const isCritical = Math.random() < (player2.criticalChance || 0);
+
+            let hitCount = 0;
+            for (let e of enemies) {
+                if (e.isDead) continue;
+                const dist = Math.hypot(player2.x - e.x, player2.y - e.y);
+                if (dist < player2.radius + e.radius + attackRadius) {
+                    const dx = e.x - player2.x;
+                    const dy = e.y - player2.y;
+                    let angle = Math.atan2(dy, dx);
+                    let playerAngle = 0;
+                    if (player2.facing === 'right') playerAngle = 0;
+                    else if (player2.facing === 'down') playerAngle = Math.PI / 2;
+                    else if (player2.facing === 'left') playerAngle = Math.PI;
+                    else if (player2.facing === 'up') playerAngle = -Math.PI / 2;
+
+                    let diff = angle - playerAngle;
+                    while (diff > Math.PI) diff -= Math.PI * 2;
+                    while (diff < -Math.PI) diff += Math.PI * 2;
+
+                    if (Math.abs(diff) < 1.2) {
+                        let damage = 1;
+                        if (isCritical) damage = 3;
+                        if (e.type === 'boss') damage = Math.ceil(damage * 1.5);
+
+                        e.hp -= Math.ceil(damage * multiplier);
+                        e.hitTimer = 15;
+                        hitCount++;
+
+                        createParticles(e.x, e.y, '#64B5F6', 15);
+
+                        if (e.hp <= 0) {
+                            e.isDead = true;
+                            const bonus = e.type === 'boss' ? 100 : 30;
+                            player2.score += bonus;
+                            enemiesDefeated++;
+                            totalKills++;
+                            comboCount++;
+                            if (comboCount > maxCombo) maxCombo = comboCount;
+
+                            const comboMultiplier = Math.min(comboCount, 5);
+                            const comboBonus = comboMultiplier * 5;
+                            coins += comboBonus;
+
+                            comboDisplay.textContent = `💥 Combo: x${comboMultiplier}`;
+                            comboDisplay.style.color = comboCount >= 5 ? '#f5c842' : '#64B5F6';
+
+                            if (e.type === 'boss') {
+                                ninjaStatus.innerText = `👑 CHEFÃO DERROTADO! +${bonus + comboBonus}`;
+                                createParticles(e.x, e.y, '#f5c842', 100);
+                            } else {
+                                ninjaStatus.innerText = `⚔️ P2 derrotou inimigo! +${bonus + comboBonus}`;
+                            }
+
+                            checkAchievements();
+                            updateUI();
+                            saveProgress();
+
+                            const allDead = enemies.every(en => en.isDead);
+                            if (allDead) {
+                                door.active = true;
+                                if (currentPhase === 10) {
+                                    ninjaStatus.innerText = '👑 CHEFÃO DERROTADO! Você venceu!';
+                                } else {
+                                    ninjaStatus.innerText = '🚪 Porta aberta! Vá para a próxima fase!';
+                                }
+                                setTimeout(() => {
+                                    if (!gameOver && !winCondition) ninjaStatus.innerText = '🚪 Vá para a porta!';
+                                }, 2000);
+                            }
+                        } else {
+                            if (e.type === 'boss') {
+                                ninjaStatus.innerText =
+                                    `👑 CHEFÃO ATINGIDO! HP: ${e.hp}/${e.maxHp}`;
+                            } else {
+                                ninjaStatus.innerText = `💥 P2 atingiu! HP: ${e.hp}/${e.maxHp}`;
+                            }
+                            setTimeout(() => {
+                                if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+                            }, 400);
+                        }
+                    }
+                }
+            }
+            if (hitCount === 0) {
+                comboCount = 0;
+                comboDisplay.textContent = '💥 Combo: x1';
+                comboDisplay.style.color = '#888';
+            }
+        }
+
+        // ===== DRAW PLAYER COM ESPADA E BARRA DE VIDA =====
+        function drawPlayerWithSword(playerObj, color, symbol, isP2) {
+            const px = playerObj.x,
+                py = playerObj.y;
+
+            // Trail
+            for (let i = 0; i < playerObj.trail.length; i++) {
+                const t = playerObj.trail[i];
+                const alpha = i / playerObj.trail.length * 0.3;
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, playerObj.radius * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // Invincible flash
+            if (playerObj.invincible && Math.floor(gameTime / 4) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
+            }
+
+            // Dash effect
+            if (playerObj.isDashing) {
+                ctx.shadowColor = 'rgba(255,200,50,0.5)';
+                ctx.shadowBlur = 30;
+                ctx.strokeStyle = 'rgba(255,200,50,0.3)';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(px, py, playerObj.radius + 10, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Shield
+            if (playerObj.hasShield && playerObj.shieldHP > 0) {
+                ctx.shadowColor = '#4CAF50';
+                ctx.shadowBlur = 30;
+                ctx.strokeStyle = 'rgba(76, 175, 80, 0.4)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(px, py, playerObj.radius + 12, 0, Math.PI * 2);
+                ctx.stroke();
+                for (let i = 0; i < playerObj.shieldHP; i++) {
+                    const angle = (i / playerObj.shieldHP) * Math.PI * 2;
+                    const sx = px + Math.cos(angle) * (playerObj.radius + 12);
+                    const sy = py + Math.sin(angle) * (playerObj.radius + 12);
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Corpo
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 28;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(px, py, playerObj.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = isP2 ? '#1a237e' : '#c0392b';
+            ctx.beginPath();
+            ctx.ellipse(px, py + 2, playerObj.radius * 0.7, playerObj.radius * 0.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mãos
+            const handOffset = 8;
+            let handX = 0,
+                handY = 0;
+            if (playerObj.facing === 'right') {
+                handX = handOffset;
+                handY = -4;
+            } else if (playerObj.facing === 'left') {
+                handX = -handOffset;
+                handY = -4;
+            } else if (playerObj.facing === 'up') {
+                handX = 0;
+                handY = -handOffset;
+            } else if (playerObj.facing === 'down') {
+                handX = 0;
+                handY = handOffset;
+            }
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = isP2 ? '#64B5F6' : '#ffb3b3';
+            ctx.beginPath();
+            ctx.arc(px + handX - 5, py + handY + 2, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = isP2 ? '#4a90c4' : '#e6a0a0';
+            ctx.beginPath();
+            ctx.arc(px + handX - 5, py + handY + 2, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = isP2 ? '#64B5F6' : '#ffb3b3';
+            ctx.beginPath();
+            ctx.arc(px + handX + 5, py + handY + 2, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = isP2 ? '#4a90c4' : '#e6a0a0';
+            ctx.beginPath();
+            ctx.arc(px + handX + 5, py + handY + 2, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 5;
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.moveTo(px - 6, py - 2);
+            ctx.lineTo(px + handX - 5, py + handY + 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(px + 6, py - 2);
+            ctx.lineTo(px + handX + 5, py + handY + 2);
+            ctx.stroke();
+
+            // Olhos
+            ctx.fillStyle = '#eee';
+            ctx.shadowBlur = 0;
+            let eyeOffX = 0,
+                eyeOffY = 0;
+            if (playerObj.facing === 'up') eyeOffY = -6;
+            else if (playerObj.facing === 'down') eyeOffY = 6;
+            else if (playerObj.facing === 'left') eyeOffX = -6;
+            else if (playerObj.facing === 'right') eyeOffX = 6;
+
+            ctx.beginPath();
+            ctx.arc(px - 6 + eyeOffX * 0.3, py - 4 + eyeOffY * 0.3, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(px + 6 + eyeOffX * 0.3, py - 4 + eyeOffY * 0.3, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.arc(px - 6 + eyeOffX * 0.6, py - 4 + eyeOffY * 0.6, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(px + 6 + eyeOffX * 0.6, py - 4 + eyeOffY * 0.6, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bandana
+            ctx.fillStyle = isP2 ? '#1a237e' : '#c0392b';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.ellipse(px, py - 12, 14, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(px - 14, py - 14);
+            ctx.lineTo(px - 22, py - 20);
+            ctx.lineTo(px - 14, py - 10);
+            ctx.fill();
+
+            // ESPADA
+            if (playerObj.hasSword) {
+                ctx.save();
+                ctx.translate(px + handX, py + handY);
+
+                let swordAngle = 0;
+                if (playerObj.facing === 'right') swordAngle = -0.2;
+                else if (playerObj.facing === 'down') swordAngle = Math.PI / 2 + 0.2;
+                else if (playerObj.facing === 'left') swordAngle = Math.PI + 0.2;
+                else if (playerObj.facing === 'up') swordAngle = -Math.PI / 2 - 0.2;
+
+                if (playerObj.isAttacking) {
+                    const progress = 1 - (playerObj.attackTimer / 15);
+                    const swingAngle = progress * Math.PI * 1.2 - Math.PI * 0.6;
+                    swordAngle += swingAngle;
+                }
+
+                ctx.rotate(swordAngle);
+
+                const isLegendary = currentPhase === 5 && legendarySwordActive;
+                const scale = isLegendary ? 1.8 : 1;
+                const bladeLength = 45 * scale;
+                const tsukaLength = 16 * scale;
+
+                ctx.shadowColor = '#8B4513';
+                ctx.shadowBlur = 10 * scale;
+                const gradCabo = ctx.createLinearGradient(0, -2 * scale, 0, tsukaLength);
+                gradCabo.addColorStop(0, '#8B4513');
+                gradCabo.addColorStop(0.3, '#A0522D');
+                gradCabo.addColorStop(0.6, '#8B4513');
+                gradCabo.addColorStop(1, '#5D3A1A');
+                ctx.fillStyle = gradCabo;
+                ctx.fillRect(-3 * scale, -2 * scale, 6 * scale, tsukaLength);
+
+                ctx.strokeStyle = '#D4A574';
+                ctx.lineWidth = 0.5 * scale;
+                for (let i = 2 * scale; i < tsukaLength - 2 * scale; i += 3 * scale) {
+                    ctx.beginPath();
+                    ctx.moveTo(-3 * scale, i);
+                    ctx.lineTo(3 * scale, i + 1 * scale);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(3 * scale, i);
+                    ctx.lineTo(-3 * scale, i + 1 * scale);
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#5D3A1A';
+                ctx.shadowBlur = 8 * scale;
+                ctx.fillRect(-4 * scale, tsukaLength - 2 * scale, 8 * scale, 4 * scale);
+                ctx.fillStyle = '#D4A574';
+                ctx.fillRect(-3 * scale, tsukaLength - 1 * scale, 6 * scale, 2 * scale);
+
+                ctx.shadowBlur = 12 * scale;
+                ctx.fillStyle = '#2C1810';
+                ctx.fillRect(-8 * scale, -4 * scale, 16 * scale, 4 * scale);
+                ctx.fillStyle = '#D4A574';
+                ctx.fillRect(-7 * scale, -3 * scale, 14 * scale, 2 * scale);
+
+                const bladeGrad = ctx.createLinearGradient(0, -5 * scale, 0, -bladeLength);
+                bladeGrad.addColorStop(0, '#C0C0C0');
+                bladeGrad.addColorStop(0.2, '#E8E8E8');
+                bladeGrad.addColorStop(0.4, '#F5F5F5');
+                bladeGrad.addColorStop(0.6, '#FFFFFF');
+                bladeGrad.addColorStop(0.8, '#E8E8E8');
+                bladeGrad.addColorStop(1, '#C0C0C0');
+
+                ctx.fillStyle = bladeGrad;
+                ctx.shadowColor = isLegendary ? '#ffd700' : '#ffd700';
+                ctx.shadowBlur = isLegendary ? 50 : 25;
+
+                ctx.beginPath();
+                ctx.moveTo(-3 * scale, -5 * scale);
+                ctx.quadraticCurveTo(-5 * scale, -15 * scale, -4 * scale, -25 * scale);
+                ctx.quadraticCurveTo(-3 * scale, -35 * scale, -2 * scale, -bladeLength + 5 * scale);
+                ctx.lineTo(0, -bladeLength);
+                ctx.lineTo(2 * scale, -bladeLength + 5 * scale);
+                ctx.quadraticCurveTo(3 * scale, -35 * scale, 4 * scale, -25 * scale);
+                ctx.quadraticCurveTo(5 * scale, -15 * scale, 3 * scale, -5 * scale);
+                ctx.closePath();
+                ctx.fill();
+
+                if (isLegendary) {
+                    ctx.shadowColor = '#f5c842';
+                    ctx.shadowBlur = 80;
+                    ctx.strokeStyle = 'rgba(245, 200, 66, 0.4)';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    for (let i = -10 * scale; i > -bladeLength + 5 * scale; i -= 4 * scale) {
+                        const wave = Math.sin(i * 0.5) * 2 * scale;
+                        ctx.lineTo(wave, i);
+                    }
+                    ctx.stroke();
+
+                    ctx.shadowBlur = 100;
+                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -bladeLength * 0.3);
+                    ctx.lineTo(0, -bladeLength * 0.8);
+                    ctx.stroke();
+                }
+
+                ctx.shadowBlur = 30 * scale;
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
+                ctx.lineWidth = 1.5 * scale;
+                ctx.beginPath();
+                for (let i = -10 * scale; i > -bladeLength + 5 * scale; i -= 4 * scale) {
+                    const wave = Math.sin(i * 0.5) * 2 * scale;
+                    ctx.lineTo(wave, i);
+                }
+                ctx.stroke();
+
+                ctx.shadowBlur = 40 * scale;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.lineWidth = 0.5 * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, -8 * scale);
+                ctx.lineTo(0, -bladeLength + 8 * scale);
+                ctx.stroke();
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.shadowBlur = 35 * scale;
+                ctx.beginPath();
+                ctx.moveTo(-1.5 * scale, -bladeLength + 5 * scale);
+                ctx.quadraticCurveTo(-2 * scale, -bladeLength + 3 * scale, 0, -bladeLength);
+                ctx.quadraticCurveTo(2 * scale, -bladeLength + 3 * scale, 1.5 * scale, -bladeLength + 5 * scale);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            // Efeito de ataque
+            if (playerObj.isAttacking) {
+                ctx.save();
+                ctx.translate(px + handX, py + handY);
+
+                let slashAngle = 0;
+                if (playerObj.facing === 'right') slashAngle = -0.2;
+                else if (playerObj.facing === 'down') slashAngle = Math.PI / 2 + 0.2;
+                else if (playerObj.facing === 'left') slashAngle = Math.PI + 0.2;
+                else if (playerObj.facing === 'up') slashAngle = -Math.PI / 2 - 0.2;
+
+                const progress = 1 - (playerObj.attackTimer / 15);
+                const swingAngle = progress * Math.PI * 1.2 - Math.PI * 0.6;
+                slashAngle += swingAngle;
+
+                ctx.rotate(slashAngle);
+
+                ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+                ctx.shadowBlur = 50;
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.7)';
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.arc(30, 0, 50, -0.8, 0.8);
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(30, 0, 45, -0.6, 0.6);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
+            ctx.fillStyle = '#fff';
+            ctx.shadowBlur = 10;
+            ctx.font = '16px "Segoe UI"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(symbol, px, py + 2);
+            ctx.shadowBlur = 0;
+
+            // BARRA DE VIDA
+            const barWidth = 40;
+            const barHeight = 5;
+            const barX = px - barWidth / 2;
+            const barY = py - playerObj.radius - 15;
+
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(barX, barY, barWidth, barHeight);
+
+            const hpPercent = playerObj.hp / playerObj.maxHp;
+            const hpColor = hpPercent > 0.5 ? '#4CAF50' : (hpPercent > 0.25 ? '#FFA500' : '#e94560');
+            ctx.fillStyle = hpColor;
+            ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(barX, barY, barWidth, barHeight);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '8px "Segoe UI"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(`${playerObj.hp}/${playerObj.maxHp}`, px, barY - 2);
+
+            ctx.fillStyle = isP2 ? '#64B5F6' : '#e94560';
+            ctx.font = 'bold 10px "Segoe UI"';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(isP2 ? 'P2' : 'P1', px, barY - 12);
+        }
+
+        function updatePlayer(playerObj, keysObj, isP2) {
+            if (gameOver || winCondition) return;
+
+            if (playerObj.invincible) {
+                playerObj.invincibleTimer--;
+                if (playerObj.invincibleTimer <= 0) {
+                    playerObj.invincible = false;
+                }
+            }
+
+            playerObj.trail.push({ x: playerObj.x, y: playerObj.y });
+            if (playerObj.trail.length > 10) playerObj.trail.shift();
+
+            if (keysObj.shift && playerObj.canDash && !playerObj.isDashing) {
+                playerObj.isDashing = true;
+                playerObj.dashTimer = 12;
+                playerObj.canDash = false;
+                playerObj.dashCooldown = 40;
+                const dashPower = 8 * (playerObj.dashMultiplier || 1);
+                if (playerObj.facing === 'up') playerObj.vy = -dashPower;
+                else if (playerObj.facing === 'down') playerObj.vy = dashPower;
+                else if (playerObj.facing === 'left') playerObj.vx = -dashPower;
+                else if (playerObj.facing === 'right') playerObj.vx = dashPower;
+                createParticles(playerObj.x, playerObj.y, '#ffa500', 20);
+                if (!isP2) ninjaStatus.innerText = '⚡ P1 Dash!';
+                else ninjaStatus.innerText = '⚡ P2 Dash!';
+            }
+
+            if (keysObj.e) {
+                if (!isP2) performAttackP1();
+                else performAttackP2();
+                keysObj.e = false;
+            }
+
+            if (playerObj.isAttacking) {
+                playerObj.attackTimer--;
+                if (playerObj.attackTimer <= 0) {
+                    playerObj.isAttacking = false;
+                    if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+                }
+            }
+
+            let dx = 0,
+                dy = 0;
+            if (keysObj.w) dy = -1;
+            if (keysObj.s) dy = 1;
+            if (keysObj.a) dx = -1;
+            if (keysObj.d) dx = 1;
+
+            if (dx !== 0 || dy !== 0) {
+                if (dy < 0) playerObj.facing = 'up';
+                else if (dy > 0) playerObj.facing = 'down';
+                else if (dx < 0) playerObj.facing = 'left';
+                else if (dx > 0) playerObj.facing = 'right';
+                playerObj.isMoving = true;
+            } else {
+                playerObj.isMoving = false;
+            }
+
+            if (!playerObj.isDashing) {
+                if (dx !== 0 || dy !== 0) {
+                    const len = Math.hypot(dx, dy);
+                    const normX = dx / len;
+                    const normY = dy / len;
+                    playerObj.vx += (normX * playerObj.speed - playerObj.vx) * 0.25;
+                    playerObj.vy += (normY * playerObj.speed - playerObj.vy) * 0.25;
+                } else {
+                    playerObj.vx *= 0.85;
+                    playerObj.vy *= 0.85;
+                    if (Math.abs(playerObj.vx) < 0.1) playerObj.vx = 0;
+                    if (Math.abs(playerObj.vy) < 0.1) playerObj.vy = 0;
+                }
+            } else {
+                playerObj.vx *= 0.96;
+                playerObj.vy *= 0.96;
+                playerObj.dashTimer--;
+                if (playerObj.dashTimer <= 0) {
+                    playerObj.isDashing = false;
+                    playerObj.vx = 0;
+                    playerObj.vy = 0;
+                }
+            }
+
+            let newX = playerObj.x + playerObj.vx;
+            let newY = playerObj.y + playerObj.vy;
+
+            if (!isBlocked(newX, playerObj.y, playerObj.radius)) {
+                playerObj.x = newX;
+            } else {
+                playerObj.vx = 0;
+            }
+            if (!isBlocked(playerObj.x, newY, playerObj.radius)) {
+                playerObj.y = newY;
+            } else {
+                playerObj.vy = 0;
+            }
+
+            // Coleta de itens
+            for (let c of collectibles) {
+                if (c.collected) continue;
+                if (Math.hypot(playerObj.x - c.x, playerObj.y - c.y) < playerObj.radius + c.radius) {
+                    c.collected = true;
+                    totalCollects++;
+
+                    if (c.type === 'coin') {
+                        coins += 10;
+                        createParticles(c.x, c.y, '#f5c842', 15);
+                        ninjaStatus.innerText = `🪙 ${isP2 ? 'P2' : 'P1'} +10 moedas!`;
+                    } else if (c.type === 'star') {
+                        playerObj.score += 10;
+                        createParticles(c.x, c.y, '#f5c842', 20);
+                        ninjaStatus.innerText = `✨ ${isP2 ? 'P2' : 'P1'} +10 pontos!`;
+                    } else {
+                        playerObj.score += 20;
+                        createParticles(c.x, c.y, '#ff6b6b', 25);
+                        ninjaStatus.innerText = `🗡️ ${isP2 ? 'P2' : 'P1'} +20 pontos!`;
+                    }
+
+                    checkAchievements();
+                    updateUI();
+                    saveProgress();
+
+                    setTimeout(() => {
+                        if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+                    }, 400);
+                }
+            }
+
+            // Coleta da Espada Lendária
+            if (legendarySword.active && !legendarySword.collected) {
+                if (Math.hypot(playerObj.x - legendarySword.x, playerObj.y - legendarySword.y) < playerObj.radius + 30) {
+                    legendarySword.collected = true;
+                    legendarySword.active = false;
+                    createParticles(legendarySword.x, legendarySword.y, '#f5c842', 50);
+                    ninjaStatus.innerText = '⚔️ Espada Lendária Encontrada! Escolha seu poder!';
+                    showPowerSelection();
+                }
+            }
+
+            // Porta
+            if (door.active && playerObj.x > door.x - 20 && playerObj.x < door.x + 40 &&
+                playerObj.y > door.y - 20 && playerObj.y < door.y + 50) {
+                winCondition = true;
+                phasesCompleted++;
+                if (currentPhase === 10) {
+                    ninjaStatus.innerText = '👑 VOCÊ DERROTOU O CHEFÃO! VITÓRIA!';
+                    totalScore += 200;
+                    coins += 100;
+                } else {
+                    ninjaStatus.innerText = '🚪 Fase Concluída! +50 pts +20 moedas';
+                    totalScore += 50;
+                    coins += 20;
+                }
+                nextPhaseBtn.style.display = 'inline-block';
+                checkAchievements();
+                saveProgress();
+                updateUI();
+            }
+        }
+
+        // ===== INIMIGOS (COM IA DO CHEFÃO) =====
+        function updateEnemies() {
+            for (let e of enemies) {
+                if (e.isDead) continue;
+                if (e.hitTimer > 0) e.hitTimer--;
+                if (e.attackCooldown > 0) e.attackCooldown--;
+
+                const distToP1 = Math.hypot(player.x - e.x, player.y - e.y);
+                const distToP2 = p2Active ? Math.hypot(player2.x - e.x, player2.y - e.y) : Infinity;
+                const minDist = Math.min(distToP1, distToP2);
+
+                let target = distToP1 <= distToP2 ? player : (p2Active ? player2 : player);
+
+                // ===== IA DO CHEFÃO =====
+                if (e.type === 'boss') {
+                    // Chefão sempre persegue
+                    e.state = 'chase';
+
+                    // Ataques especiais do chefão
+                    if (e.attackCooldown <= 0) {
+                        // Ataque em área (fogo)
+                        if (Math.random() < 0.08) {
+                            createParticles(e.x, e.y, '#ff4400', 30);
+                            // Dano em área nos jogadores
+                            if (distToP1 < 150) {
+                                takeDamage(player, 1, false);
+                            }
+                            if (p2Active && distToP2 < 150) {
+                                takeDamage(player2, 1, true);
+                            }
+                            ninjaStatus.innerText = '👑 ATAQUE DE FOGO DO CHEFÃO!';
+                            e.attackCooldown = 80;
+                        }
+                        // Ataque rápido
+                        else if (Math.random() < 0.05) {
+                            // Dash do chefão
+                            const dashAngle = Math.atan2(target.y - e.y, target.x - e.x);
+                            const dashSpeed = 8;
+                            e.x += Math.cos(dashAngle) * dashSpeed;
+                            e.y += Math.sin(dashAngle) * dashSpeed;
+                            createParticles(e.x, e.y, '#ff0000', 20);
+
+                            // Verifica se acertou o jogador
+                            if (distToP1 < 60) {
+                                takeDamage(player, 2, false);
+                            }
+                            if (p2Active && distToP2 < 60) {
+                                takeDamage(player2, 2, true);
+                            }
+                            e.attackCooldown = 60;
+                        }
+                    }
+
+                    // Movimento do chefão (mais lento que os outros)
+                    const dx = target.x - e.x;
+                    const dy = target.y - e.y;
+                    const angle = Math.atan2(dy, dx);
+                    const moveX = Math.cos(angle) * e.speed * 0.8;
+                    const moveY = Math.sin(angle) * e.speed * 0.8;
+
+                    let ex = e.x + moveX;
+                    let ey = e.y + moveY;
+
+                    if (ex - e.radius > 0 && ex + e.radius < W && !isBlocked(ex, e.y, e.radius)) {
+                        e.x = ex;
+                    } else {
+                        e.patrolAngle += Math.PI / 2;
+                    }
+                    if (ey - e.radius > 0 && ey + e.radius < H && !isBlocked(e.x, ey, e.radius)) {
+                        e.y = ey;
+                    } else {
+                        e.patrolAngle += Math.PI / 2;
+                    }
+
+                    // Ataque corpo a corpo do chefão
+                    if (minDist < player.radius + e.radius + 10 && e.attackCooldown <= 0) {
+                        const isP1Target = distToP1 <= distToP2;
+                        if (isP1Target) {
+                            takeDamage(player, 2, false);
+                        } else if (p2Active) {
+                            takeDamage(player2, 2, true);
+                        }
+                        e.attackCooldown = 40;
+                        createParticles(e.x, e.y, '#ff0000', 30);
+                        ninjaStatus.innerText = '👑 CHEFÃO ATACOU!';
+                    }
+                } else {
+                    // ===== INIMIGOS NORMAIS (FÁCEIS) =====
+                    if (minDist < 150) {
+                        e.state = 'chase';
+                    } else {
+                        e.state = 'patrol';
+                    }
+
+                    if (e.state === 'chase') {
+                        const dx = target.x - e.x;
+                        const dy = target.y - e.y;
+                        const angle = Math.atan2(dy, dx);
+                        const moveX = Math.cos(angle) * e.speed;
+                        const moveY = Math.sin(angle) * e.speed;
+
+                        let ex = e.x + moveX;
+                        let ey = e.y + moveY;
+
+                        if (ex - e.radius > 0 && ex + e.radius < W && !isBlocked(ex, e.y, e.radius)) {
+                            e.x = ex;
+                        } else {
+                            e.patrolAngle += Math.PI / 2;
+                        }
+                        if (ey - e.radius > 0 && ey + e.radius < H && !isBlocked(e.x, ey, e.radius)) {
+                            e.y = ey;
+                        } else {
+                            e.patrolAngle += Math.PI / 2;
+                        }
+
+                        if (minDist < player.radius + e.radius + 5 && e.attackCooldown <= 0) {
+                            const isP1Target = distToP1 <= distToP2;
+                            if (isP1Target) {
+                                takeDamage(player, e.damage, false);
+                            } else if (p2Active) {
+                                takeDamage(player2, e.damage, true);
+                            }
+                            e.attackCooldown = 60;
+                        }
+                    } else {
+                        e.directionChange--;
+                        if (e.directionChange <= 0) {
+                            e.patrolAngle += (Math.random() - 0.5) * 1.5;
+                            e.directionChange = 40 + Math.random() * 80;
+                        }
+                        const moveX = Math.cos(e.patrolAngle) * e.speed * 0.5;
+                        const moveY = Math.sin(e.patrolAngle) * e.speed * 0.5;
+
+                        let ex = e.x + moveX;
+                        let ey = e.y + moveY;
+                        if (ex - e.radius > 0 && ex + e.radius < W && !isBlocked(ex, e.y, e.radius)) {
+                            e.x = ex;
+                        } else {
+                            e.patrolAngle += Math.PI / 2;
+                        }
+                        if (ey - e.radius > 0 && ey + e.radius < H && !isBlocked(e.x, ey, e.radius)) {
+                            e.y = ey;
+                        } else {
+                            e.patrolAngle += Math.PI / 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        function update() {
+            if (gameOver || winCondition) return;
+            if (showPowerSelect) return;
+
+            gameTime++;
+
+            processGamepadInput();
+
+            if (gamepad1Connected) {
+                const gp = gamepadState.p1;
+                keys.p1.w = gp.up;
+                keys.p1.s = gp.down;
+                keys.p1.a = gp.left;
+                keys.p1.d = gp.right;
+                if (gp.dash) keys.p1.shift = true;
+                if (gp.attack) keys.p1.e = true;
+                if (gp.power) keys.p1.q = true;
+            }
+
+            if (gamepad2Connected && gameMode === 2) {
+                const gp = gamepadState.p2;
+                keys.p2.w = gp.up;
+                keys.p2.s = gp.down;
+                keys.p2.a = gp.left;
+                keys.p2.d = gp.right;
+                if (gp.dash) keys.p2.shift = true;
+                if (gp.attack) keys.p2.e = true;
+                if (gp.power) keys.p2.q = true;
+            }
+
+            if (keys.p1.q && !player.isAttacking) {
+                keys.p1.q = false;
+                activatePowerP1();
+            }
+            if (keys.p2.q && p2Active && !player2.isAttacking) {
+                keys.p2.q = false;
+                activatePowerP2();
+            }
+
+            updatePlayer(player, keys.p1, false);
+            if (p2Active) {
+                updatePlayer(player2, keys.p2, true);
+            }
+
+            updateEnemies();
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.life--;
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            if (!player.canDash) {
+                player.dashCooldown--;
+                if (player.dashCooldown <= 0) player.canDash = true;
+            }
+            if (player.attackCooldown > 0) player.attackCooldown--;
+
+            if (p2Active) {
+                if (!player2.canDash) {
+                    player2.dashCooldown--;
+                    if (player2.dashCooldown <= 0) player2.canDash = true;
+                }
+                if (player2.attackCooldown > 0) player2.attackCooldown--;
+            }
+
+            if (gameOver || winCondition) {
+                player.vx = 0;
+                player.vy = 0;
+                if (p2Active) {
+                    player2.vx = 0;
+                    player2.vy = 0;
+                }
+            }
+        }
+
+        // ========== PODERES ==========
+        function activatePowerP1() {
+            if (unlockedPowers === 0) {
+                ninjaStatus.innerText = '🔒 Nenhum poder desbloqueado!';
+                return;
+            }
+
+            const powerIndex = unlockedPowers - 1;
+            const power = POWERS[powerIndex];
+            totalPowersUsed++;
+            createParticles(player.x, player.y, power.color, 30);
+
+            ninjaStatus.innerText = `🌟 ${power.name} ATIVADO!`;
+
+            switch (powerIndex) {
+                case 0:
+                    player.attackMultiplier = 1.5;
+                    break;
+                case 1:
+                    player.dashMultiplier = 2;
+                    player.speed = 4.5;
+                    break;
+                case 2:
+                    player.hasShield = true;
+                    player.shieldHP = 5;
+                    break;
+                case 3:
+                    player.criticalChance = 0.5;
+                    break;
+                case 4:
+                    player.reviveCount = 1;
+                    break;
+                case 5:
+                case 6:
+                    for (let e of enemies) {
+                        if (!e.isDead) {
+                            e.hp -= 3;
+                            e.hitTimer = 10;
+                            createParticles(e.x, e.y, '#ff6b6b', 20);
+                            if (e.hp <= 0) {
+                                e.isDead = true;
+                                player.score += 30;
+                                enemiesDefeated++;
+                                totalKills++;
+                            }
+                        }
+                    }
+                    updateUI();
+                    break;
+                case 7:
+                    player.speed = 5.5;
+                    player.criticalChance = 0.7;
+                    break;
+            }
+
+            checkAchievements();
+            saveProgress();
+
+            setTimeout(() => {
+                player.attackMultiplier = 1;
+                player.dashMultiplier = 1;
+                player.speed = 3.2;
+                player.criticalChance = 0;
+                if (unlockedPowers < 3) {
+                    player.hasShield = false;
+                    player.shieldHP = 0;
+                }
+                if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+            }, 5000);
+        }
+
+        function activatePowerP2() {
+            if (unlockedPowers === 0) {
+                ninjaStatus.innerText = '🔒 Nenhum poder desbloqueado!';
+                return;
+            }
+
+            const powerIndex = unlockedPowers - 1;
+            const power = POWERS[powerIndex];
+            totalPowersUsed++;
+            createParticles(player2.x, player2.y, power.color, 30);
+
+            ninjaStatus.innerText = `🌟 P2: ${power.name} ATIVADO!`;
+
+            switch (powerIndex) {
+                case 0:
+                    player2.attackMultiplier = 1.5;
+                    break;
+                case 1:
+                    player2.dashMultiplier = 2;
+                    player2.speed = 4.5;
+                    break;
+                case 2:
+                    player2.hasShield = true;
+                    player2.shieldHP = 5;
+                    break;
+                case 3:
+                    player2.criticalChance = 0.5;
+                    break;
+                case 4:
+                    player2.reviveCount = 1;
+                    break;
+                case 5:
+                case 6:
+                    for (let e of enemies) {
+                        if (!e.isDead) {
+                            e.hp -= 3;
+                            e.hitTimer = 10;
+                            createParticles(e.x, e.y, '#64B5F6', 20);
+                            if (e.hp <= 0) {
+                                e.isDead = true;
+                                player2.score += 30;
+                                enemiesDefeated++;
+                                totalKills++;
+                            }
+                        }
+                    }
+                    updateUI();
+                    break;
+                case 7:
+                    player2.speed = 5.5;
+                    player2.criticalChance = 0.7;
+                    break;
+            }
+
+            checkAchievements();
+            saveProgress();
+
+            setTimeout(() => {
+                player2.attackMultiplier = 1;
+                player2.dashMultiplier = 1;
+                player2.speed = 3.2;
+                player2.criticalChance = 0;
+                if (unlockedPowers < 3) {
+                    player2.hasShield = false;
+                    player2.shieldHP = 0;
+                }
+                if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+            }, 5000);
+        }
+
+        // ========== DRAW ==========
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+
+            const phaseData = PHASES[currentPhase] || PHASES[1];
+            const grad = ctx.createRadialGradient(450, 300, 100, 450, 300, 500);
+            grad.addColorStop(0, phaseData.bg || '#3a6b4f');
+            grad.addColorStop(1, '#1a1a2a');
+
+            // Fundo especial para o chefão
+            if (phaseData.boss) {
+                ctx.fillStyle = '#1a0a0a';
+                ctx.fillRect(0, 0, W, H);
+                // Efeito de fogo no fundo
+                for (let i = 0; i < 20; i++) {
+                    const x = Math.random() * W;
+                    const y = Math.random() * H;
+                    const alpha = 0.05 + Math.random() * 0.1;
+                    const size = 20 + Math.random() * 60;
+                    ctx.fillStyle = `rgba(255, 68, 0, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else {
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, W, H);
+            }
+
+            // Partículas
+            for (let p of particles) {
+                ctx.globalAlpha = p.life / p.maxLife;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // Arbustos
+            for (let b of bushes) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#2d5a27';
+                ctx.shadowColor = '#0f1f0a';
+                ctx.shadowBlur = 8;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // Árvores
+            for (let t of trees) {
+                ctx.fillStyle = '#4d2e1b';
+                ctx.fillRect(t.x - 4, t.y + 4, 8, 18);
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#2b6b2b';
+                ctx.shadowColor = '#0a1f0a';
+                ctx.shadowBlur = 14;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(t.x - 6, t.y - 6, t.radius * 0.4, 0, Math.PI * 2);
+                ctx.fillStyle = '#3d8a3d';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // Pedras
+            for (let r of rocks) {
+                ctx.beginPath();
+                ctx.ellipse(r.x, r.y, r.radius, r.radius * 0.7, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#6b6b6b';
+                ctx.shadowColor = '#222';
+                ctx.shadowBlur = 6;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.ellipse(r.x - 3, r.y - 4, r.radius * 0.3, r.radius * 0.2, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#8a8a8a';
+                ctx.fill();
+            }
+
+            // Colecionáveis
+            for (let c of collectibles) {
+                if (c.collected) continue;
+                const pulse = 1 + 0.08 * Math.sin(gameTime * 0.06 + c.x);
+                if (c.type === 'coin') {
+                    ctx.shadowColor = '#f5c842';
+                    ctx.shadowBlur = 18;
+                    ctx.fillStyle = '#f5c842';
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.radius * pulse, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#d4a017';
+                    ctx.font = '14px "Segoe UI"';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('$', c.x, c.y + 1);
+                    ctx.shadowBlur = 0;
+                } else if (c.type === 'star') {
+                    ctx.shadowColor = '#f5d742';
+                    ctx.shadowBlur = 18;
+                    ctx.fillStyle = '#f5c842';
+                    ctx.beginPath();
+                    const points = 5;
+                    const outerR = c.radius * pulse;
+                    const innerR = outerR * 0.4;
+                    for (let i = 0; i < points * 2; i++) {
+                        const r = i % 2 === 0 ? outerR : innerR;
+                        const angle = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+                        const px = c.x + Math.cos(angle) * r;
+                        const py = c.y + Math.sin(angle) * r;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.shadowColor = '#ccc';
+                    ctx.shadowBlur = 12;
+                    ctx.fillStyle = '#b0b0b0';
+                    ctx.beginPath();
+                    ctx.ellipse(c.x, c.y, c.radius * pulse, c.radius * 0.5, 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#888';
+                    ctx.beginPath();
+                    ctx.ellipse(c.x - 4, c.y - 2, 4, 2, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            // Espada Lendária
+            if (legendarySword.active && !legendarySword.collected) {
+                const lx = legendarySword.x,
+                    ly = legendarySword.y;
+                const pulse = 1 + 0.1 * Math.sin(gameTime * 0.08);
+
+                ctx.shadowColor = '#f5c842';
+                ctx.shadowBlur = 80;
+                ctx.fillStyle = 'rgba(245, 200, 66, 0.1)';
+                ctx.beginPath();
+                ctx.arc(lx + 20, ly + 20, 60 * pulse, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 60;
+                ctx.strokeStyle = `rgba(245, 200, 66, ${0.2 + 0.1 * Math.sin(gameTime * 0.05)})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(lx + 20, ly + 20, 50 * pulse, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.shadowBlur = 40;
+                ctx.strokeStyle = `rgba(245, 200, 66, ${0.3 + 0.1 * Math.sin(gameTime * 0.07 + 1)})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(lx + 20, ly + 20, 35 * pulse, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.shadowColor = '#f5c842';
+                ctx.shadowBlur = 50;
+                ctx.font = '50px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⚔️', lx + 20, ly + 20);
+
+                ctx.shadowBlur = 30;
+                ctx.fillStyle = '#f5c842';
+                ctx.font = 'bold 16px "Segoe UI"';
+                ctx.fillText('ESPADA LENDÁRIA', lx + 20, ly + 75);
+
+                for (let i = 0; i < 8; i++) {
+                    const angle = gameTime * 0.05 + i * Math.PI / 4;
+                    const dist = 40 + 15 * Math.sin(gameTime * 0.06 + i);
+                    const px = lx + 20 + Math.cos(angle) * dist;
+                    const py = ly + 20 + Math.sin(angle) * dist;
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = `rgba(245, 200, 66, ${0.3 + 0.2 * Math.sin(gameTime * 0.08 + i)})`;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 3 + Math.sin(gameTime * 0.1 + i) * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.shadowBlur = 0;
+            }
+
+            // Inimigos
+            for (let e of enemies) {
+                if (e.isDead) continue;
+                if (e.x < -50 || e.y < -50) continue;
+
+                ctx.shadowColor = '#a00';
+                ctx.shadowBlur = 16;
+
+                let color = e.color || '#b53b3b';
+                if (e.hitTimer > 0) color = '#ff6b6b';
+
+                // Chefão tem tamanho maior e efeito especial
+                if (e.type === 'boss') {
+                    ctx.shadowColor = '#ff0000';
+                    ctx.shadowBlur = 40;
+                    ctx.fillStyle = '#8B0000';
+                    ctx.beginPath();
+                    ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Olhos do chefão
+                    ctx.fillStyle = '#ff0000';
+                    ctx.shadowBlur = 30;
+                    ctx.beginPath();
+                    ctx.arc(e.x - 15, e.y - 5, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(e.x + 15, e.y - 5, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffff00';
+                    ctx.shadowBlur = 20;
+                    ctx.beginPath();
+                    ctx.arc(e.x - 12, e.y - 8, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(e.x + 18, e.y - 8, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Coroa do chefão
+                    ctx.fillStyle = '#f5c842';
+                    ctx.shadowBlur = 20;
+                    ctx.font = '30px "Segoe UI"';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText('👑', e.x, e.y - e.radius - 10);
+
+                    // Barra de HP do chefão (grande)
+                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                    ctx.fillRect(e.x - 60, e.y - e.radius - 30, 120, 12);
+                    ctx.fillStyle = e.hp / e.maxHp > 0.3 ? '#e94560' : '#ff0000';
+                    ctx.fillRect(e.x - 60, e.y - e.radius - 30, 120 * (e.hp / e.maxHp), 12);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(e.x - 60, e.y - e.radius - 30, 120, 12);
+
+                    // Nome do chefão
+                    ctx.fillStyle = '#f5c842';
+                    ctx.font = 'bold 14px "Segoe UI"';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText('👑 CHEFÃO DAS TREVAS', e.x, e.y - e.radius - 35);
+
+                    // Aura de fogo
+                    for (let i = 0; i < 8; i++) {
+                        const angle = gameTime * 0.03 + i * Math.PI / 4;
+                        const dist = e.radius + 15 + 10 * Math.sin(gameTime * 0.05 + i);
+                        const fx = e.x + Math.cos(angle) * dist;
+                        const fy = e.y + Math.sin(angle) * dist;
+                        ctx.shadowBlur = 30;
+                        ctx.fillStyle = `rgba(255, 68, 0, ${0.3 + 0.2 * Math.sin(gameTime * 0.06 + i)})`;
+                        ctx.beginPath();
+                        ctx.arc(fx, fy, 5 + Math.sin(gameTime * 0.08 + i) * 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    ctx.shadowBlur = 0;
+                    continue;
+                }
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#333';
+                ctx.fillRect(e.x - e.radius, e.y - e.radius - 10, e.radius * 2, 4);
+                ctx.fillStyle = e.hp / e.maxHp > 0.3 ? '#4CAF50' : '#ff4444';
+                ctx.fillRect(e.x - e.radius, e.y - e.radius - 10, (e.radius * 2) * (e.hp / e.maxHp), 4);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '8px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                let typeLabel = '';
+                if (e.type === 'rapido') typeLabel = '⚡';
+                ctx.fillText(typeLabel, e.x, e.y - e.radius - 12);
+
+                ctx.fillStyle = '#222';
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.arc(e.x - 5, e.y - 3, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(e.x + 5, e.y - 3, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#f0f0f0';
+                ctx.beginPath();
+                ctx.arc(e.x - 6, e.y - 4, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(e.x + 4, e.y - 4, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // Porta
+            if (door.active) {
+                const dx = door.x,
+                    dy = door.y;
+                ctx.shadowColor = '#f5c842';
+                ctx.shadowBlur = 40;
+
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(dx, dy, 30, 50);
+
+                ctx.strokeStyle = '#D4A574';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(dx, dy, 30, 50);
+
+                ctx.fillStyle = '#f5c842';
+                ctx.shadowBlur = 20;
+                ctx.beginPath();
+                ctx.arc(dx + 25, dy + 25, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(245, 200, 66, 0.2)';
+                ctx.shadowBlur = 50;
+                ctx.beginPath();
+                ctx.arc(dx + 15, dy + 25, 25, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f5c842';
+                ctx.shadowBlur = 20;
+                ctx.font = '20px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🚪', dx + 15, dy - 15);
+
+                ctx.shadowBlur = 0;
+            }
+
+            // Jogadores
+            drawPlayerWithSword(
+                player,
+                characterData ? characterData.color : '#e94560',
+                characterData ? characterData.symbol : '🔥',
+                false
+            );
+
+            if (p2Active && p2CharacterData) {
+                drawPlayerWithSword(
+                    player2,
+                    p2CharacterData.color,
+                    p2CharacterData.symbol,
+                    true
+                );
+            }
+
+            ctx.shadowBlur = 0;
+
+            // UI
+            const remaining = collectibles.filter(c => !c.collected).length;
+            ctx.fillStyle = '#f0e6d0';
+            ctx.font = 'bold 16px "Segoe UI"';
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 12;
+
+            let infoText = `🔴 ${player.score}`;
+            if (p2Active) infoText += `   🔵 ${player2.score}`;
+            infoText += `   🎯 ${remaining}   💀 ${enemiesDefeated}   ⭐ ${coins}`;
+            if (door.active) infoText += `   🚪 PORTA ABERTA`;
+            if (legendarySword.active && !legendarySword.collected) infoText += `   ⚔️ ESPADA`;
+            if (currentPhase === 10) infoText += `   👑 CHEFÃO`;
+
+            if (gamepad1Connected) infoText += `   🎮`;
+            if (gamepad2Connected && p2Active) infoText += `🎮`;
+
+            ctx.fillText(infoText, 15, 30);
+            ctx.shadowBlur = 0;
+
+            // Aviso do chefão
+            if (bossWarning && currentPhase === 10) {
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = '#e94560';
+                ctx.font = 'bold 60px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.fillText('👑 CHEFÃO DAS TREVAS', W / 2, H / 2 - 20);
+                ctx.fillStyle = '#f5c842';
+                ctx.font = '30px "Segoe UI"';
+                ctx.fillText('⚔️ Enfrente o poderoso Chefão!', W / 2, H / 2 + 50);
+            }
+
+            if (gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = '#e94560';
+                ctx.font = 'bold 60px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.fillText('💀 GAME OVER', W / 2, H / 2 - 30);
+                ctx.fillStyle = '#ddd';
+                ctx.font = '24px "Segoe UI"';
+                ctx.fillText('Clique em "Resetar Fase" para tentar novamente', W / 2, H / 2 + 40);
+            } else if (winCondition) {
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = '#f5c842';
+                ctx.font = 'bold 50px "Segoe UI"';
+                ctx.textAlign = 'center';
+                if (currentPhase === 10) {
+                    ctx.fillText('👑 CHEFÃO DERROTADO!', W / 2, H / 2 - 30);
+                    ctx.fillStyle = '#ddd';
+                    ctx.font = '28px "Segoe UI"';
+                    ctx.fillText(`🏆 VOCÊ VENCEU O JOGO! ⭐ ${coins}`, W / 2, H / 2 + 40);
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.font = '20px "Segoe UI"';
+                    ctx.fillText('Parabéns! Você completou todas as fases!', W / 2, H / 2 + 90);
+                } else {
+                    ctx.fillText('🚪 FASE CONCLUÍDA!', W / 2, H / 2 - 30);
+                    ctx.fillStyle = '#ddd';
+                    ctx.font = '24px "Segoe UI"';
+                    ctx.fillText(`P1: ${player.score}  ${p2Active ? 'P2: ' + player2.score : ''}  ⭐ ${coins}`, W / 2, H / 2 +
+                        40);
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.font = '20px "Segoe UI"';
+                    ctx.fillText('Clique em "Próxima Fase" para continuar', W / 2, H / 2 + 90);
+                }
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+        updateGamepadStatus();
+
+        window.addEventListener('gamepadconnected', function (e) {
+            updateGamepadStatus();
+            ninjaStatus.innerText = `🎮 Gamepad Conectado: ${e.gamepad.id}`;
+            setTimeout(() => {
+                if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+            }, 2000);
+        });
+
+        window.addEventListener('gamepaddisconnected', function (e) {
+            updateGamepadStatus();
+            ninjaStatus.innerText = `🎮 Gamepad Desconectado`;
+            setTimeout(() => {
+                if (!gameOver && !winCondition) ninjaStatus.innerText = '▶ Andando';
+            }, 2000);
+        });
+    </script>
 </body>
+
 </html>
